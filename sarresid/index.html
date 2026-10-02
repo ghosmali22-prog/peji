@@ -1,0 +1,1087 @@
+<title>سررسید دوزبانه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700;800&family=Sarabun:wght@400;500;700&display=swap">
+<style>
+/* Layout: header with the day's date, a composer row (write → Claude organizes), then tabbed views
+   shown as two side-by-side panes: Persian (RTL) and Thai (LTR). Stacks to one column on phones. */
+:root{
+  --bg:#ECEFF5; --surface:#FFFFFF; --surface-2:#F5F7FB; --line:#D9DEE9;
+  --ink:#17203A; --muted:#5B6580; --primary:#22305C; --on-primary:#FFFFFF;
+  --accent:#DE9227; --accent-soft:#FBEBD2; --good:#1E9466; --bad:#CF4040;
+  --chip-bg-l:92%; --chip-fg-l:30%; --shadow:0 1px 2px rgba(23,32,58,.06),0 6px 20px rgba(23,32,58,.06);
+  --f-display:"Lalezar","Vazirmatn",Tahoma,sans-serif;
+  --f-fa:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
+  --f-th:"Sarabun","Leelawadee UI","Noto Sans Thai",Tahoma,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1220; --surface:#161B2B; --surface-2:#1C2234; --line:#2A3148;
+  --ink:#E6E9F2; --muted:#98A1B9; --primary:#B4C3FF; --on-primary:#0E1220;
+  --accent:#F0AE4E; --accent-soft:#3A2D18; --good:#47C08E; --bad:#F07070;
+  --chip-bg-l:22%; --chip-fg-l:80%; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E1220; --surface:#161B2B; --surface-2:#1C2234; --line:#2A3148;
+  --ink:#E6E9F2; --muted:#98A1B9; --primary:#B4C3FF; --on-primary:#0E1220;
+  --accent:#F0AE4E; --accent-soft:#3A2D18; --good:#47C08E; --bad:#F07070;
+  --chip-bg-l:22%; --chip-fg-l:80%; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-fa);font-size:15px;line-height:1.6}
+[lang="th"]{font-family:var(--f-th)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 60px;display:grid;gap:18px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{width:48px;height:48px;border-radius:12px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;flex:none}
+.brand h1{margin:0;font-family:var(--f-display);font-weight:400;font-size:30px;line-height:1.1;letter-spacing:0}
+.brand .sub{color:var(--muted);font-size:13px;display:flex;gap:10px;flex-wrap:wrap}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status-dot{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);padding:6px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.status-dot i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.status-dot.on i{background:var(--good)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:11px;font-weight:500;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--primary);color:var(--on-primary);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.accent{background:var(--accent);color:#1C1406;border-color:transparent;font-weight:700}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* hero row */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:stretch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.composer{padding:16px;display:grid;gap:12px}
+.composer label.lbl{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.composer textarea{width:100%;min-height:118px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:12px 14px;line-height:1.75;font-family:var(--f-fa),var(--f-th)}
+.composer textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.comp-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.examples{display:flex;gap:6px;flex-wrap:wrap}
+.ex{border:1px dashed var(--line);background:transparent;border-radius:99px;padding:4px 11px;font-size:12.5px;color:var(--muted)}
+.ex:hover{color:var(--ink);border-color:var(--muted)}
+.hint{font-size:12px;color:var(--muted)}
+.thinking{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.side{display:grid;gap:18px;grid-template-rows:auto 1fr}
+.ringcard{padding:16px;display:flex;align-items:center;gap:16px}
+.ring{width:84px;height:84px;flex:none}
+.ring circle{fill:none;stroke-width:9}
+.ring .bg{stroke:var(--surface-2)}
+.ring .fg{stroke:var(--good);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring text{fill:var(--ink);font-weight:800;font-size:19px;font-family:var(--f-fa)}
+.ringcard .k{font-size:13px;color:var(--muted)}
+.ringcard .v{font-weight:700;font-size:15px}
+.stats{display:grid;gap:4px}
+.stats .row{display:flex;gap:8px;align-items:center;font-size:13px}
+.stats .row b{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;min-width:22px;text-align:center;border-radius:99px;padding:0 7px;font-size:12px;font-weight:700}
+.pill.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.pill.ok{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.next{padding:16px;display:grid;gap:6px;align-content:start;position:relative;overflow:hidden}
+.next .eyebrow{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.next .t{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1.1}
+.next .ti{font-weight:700}
+.next .th{color:var(--muted);font-size:14px}
+.next .cd{font-size:13px;color:var(--muted)}
+
+/* reply */
+.reply{padding:14px 16px;display:grid;gap:10px;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.reply-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.reply-head b{display:flex;align-items:center;gap:8px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.duo > div{background:var(--surface-2);border-radius:10px;padding:10px 12px;min-width:0;white-space:pre-wrap}
+.duo .tag{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px;font-family:var(--f-fa)}
+
+/* toolbar */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.tabs,.seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;flex-wrap:wrap}
+.tabs button,.seg button{border:0;background:transparent;padding:7px 14px;border-radius:9px;font-weight:500;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.tabs button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.tabs .count{font-size:11.5px;opacity:.8}
+.search{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 10px}
+.search input{border:0;background:transparent;padding:8px 2px;width:170px;outline:none}
+.search svg{width:16px;height:16px;color:var(--muted)}
+
+/* panes */
+.panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.panes.single{grid-template-columns:1fr}
+.pane{padding:16px;display:grid;gap:14px;min-width:0}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.pane-head h2{margin:0;font-size:18px;font-weight:800}
+.pane[lang="th"] .pane-head h2{font-family:var(--f-th);font-weight:700}
+.flag{font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+.sec{display:grid;gap:8px}
+.sec > h3{margin:0;font-size:13px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:8px}
+.sec > h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.sec.overdue > h3{color:var(--bad)}
+
+/* timeline */
+.tl{display:grid;gap:0;position:relative}
+.tl-row{display:grid;grid-template-columns:56px 18px minmax(0,1fr);align-items:start;min-height:20px}
+.tl-time{font-variant-numeric:tabular-nums;font-weight:700;font-size:13.5px;padding-top:11px;color:var(--muted)}
+.tl-axis{position:relative;align-self:stretch}
+.tl-axis::before{content:"";position:absolute;inset-inline-start:8px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-axis::after{content:"";position:absolute;inset-inline-start:4px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid hsl(var(--h,220) 60% 50%)}
+.tl-row.past .tl-time{opacity:.6}
+.tl-row .item{margin-block:4px}
+.now{display:grid;grid-template-columns:56px 18px 1fr;align-items:center;height:18px}
+.now span{font-size:11.5px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.now i{height:2px;background:var(--accent);grid-column:2 / 4;position:relative}
+.now i::before{content:"";position:absolute;inset-inline-start:3px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+
+/* item */
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--surface-2);border:1px solid transparent;border-radius:12px;padding:9px 11px;transition:border-color .15s;position:relative}
+.item:hover{border-color:var(--line)}
+.item.prio-high{box-shadow:inset 3px 0 0 var(--bad)}
+[dir="rtl"] .item.prio-high{box-shadow:inset -3px 0 0 var(--bad)}
+.check{width:22px;height:22px;border-radius:50%;border:2px solid hsl(var(--h,220) 45% 55%);background:transparent;display:grid;place-items:center;margin-top:2px;padding:0}
+.check svg{width:13px;height:13px;opacity:0;color:#fff}
+.item.done .check{background:var(--good);border-color:var(--good)}
+.item.done .check svg{opacity:1}
+.item.done .ttl{text-decoration:line-through;color:var(--muted)}
+.item .body{min-width:0;cursor:pointer}
+.ttl{font-weight:700;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;font-size:12.5px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:0 9px;font-size:12px;font-weight:500;background:hsl(var(--h) 65% var(--chip-bg-l));color:hsl(var(--h) 55% var(--chip-fg-l));white-space:nowrap}
+.kind{display:inline-flex;align-items:center;gap:3px}
+.kind svg{width:13px;height:13px}
+.detail{font-size:13px;color:var(--muted);margin-top:3px;white-space:pre-wrap;overflow-wrap:anywhere}
+.missing{color:var(--bad);font-size:12px}
+.amount{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.ibtn{border:0;background:transparent;color:var(--muted);padding:4px;border-radius:8px;display:grid;place-items:center}
+.ibtn:hover{background:var(--surface);color:var(--ink)}
+.ibtn svg{width:16px;height:16px}
+
+.empty{padding:22px 10px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
+.empty svg{width:46px;height:46px;opacity:.5}
+
+/* categories + notes grid */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.cat{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;align-content:start;background:var(--surface)}
+.cat-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cat-h b{display:flex;align-items:center;gap:8px;min-width:0}
+.cat-h b i{width:10px;height:10px;border-radius:3px;background:hsl(var(--h) 60% 52%);flex:none}
+.cat ul{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:13.5px}
+.cat li{display:flex;gap:6px;cursor:pointer;min-width:0}
+.cat li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat li.done span{text-decoration:line-through;color:var(--muted)}
+.cat li em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.note{border-radius:12px;padding:12px 14px;background:hsl(var(--h) 70% var(--chip-bg-l));display:grid;gap:6px;cursor:pointer;align-content:start;border:1px solid transparent}
+.note:hover{border-color:var(--line)}
+.note b{overflow-wrap:anywhere}
+.note p{margin:0;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);opacity:.85}
+.note small{color:var(--muted)}
+
+.plan{padding:14px 16px;display:grid;gap:10px}
+
+/* dialogs */
+dialog{border:0;border-radius:18px;padding:0;background:var(--surface);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.35);width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 32px)}
+dialog::backdrop{background:rgba(10,14,28,.55)}
+.dlg{display:grid;gap:14px;padding:18px}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dlg-h h2{margin:0;font-size:19px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.fld{display:grid;gap:4px;min-width:0}
+.fld > span{font-size:12.5px;color:var(--muted);font-weight:500}
+.fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 10px;min-width:0}
+.fld textarea{min-height:70px;resize:vertical}
+.dlg-f{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.dlg-f .grp{display:flex;gap:8px;flex-wrap:wrap}
+.danger{color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:6px 11px;cursor:pointer;font-size:13.5px}
+.opt:has(input:checked){border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,transparent)}
+.opt input{accent-color:var(--primary)}
+.preview{background:#8A93A8;border-radius:12px;padding:14px;overflow:auto;max-height:46vh;display:flex;justify-content:center}
+.preview iframe{border:0;background:#fff;width:794px;height:1123px;transform-origin:top center;flex:none}
+.prev-box{overflow:hidden;flex:none}
+
+/* toast + reminder */
+.toasts{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:8px;pointer-events:none;z-index:50;padding-inline:16px}
+.toast{pointer-events:auto;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);max-width:560px;font-size:14px}
+.toast button{border:0;background:transparent;color:var(--accent);font-weight:800}
+.alarm{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));inset-inline:16px;margin-inline:auto;max-width:560px;z-index:60;background:var(--accent);color:#1C1406;border-radius:14px;padding:12px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;box-shadow:0 14px 40px rgba(0,0,0,.25)}
+.alarm svg{width:26px;height:26px}
+.alarm b{display:block}
+.alarm button{border:0;background:rgba(0,0,0,.12);border-radius:9px;padding:6px 10px;font-weight:700;color:inherit}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .side{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .panes{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .side{grid-template-columns:1fr}
+  .duo,.grid2{grid-template-columns:1fr}
+  .grid4{grid-template-columns:1fr 1fr}
+  .search input{width:120px}
+  .brand h1{font-size:25px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" dir="rtl" lang="fa">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 3v18"/><path d="M11.5 8h5M11.5 12h5M11.5 16h3"/></svg>
+      </div>
+      <div>
+        <h1>سررسید دوزبانه</h1>
+        <div class="sub"><span id="dateFa"></span><span lang="th" id="dateTh"></span></div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="status-dot" id="aiStatus"><i></i><span>در حال اتصال به Claude…</span></span>
+      <span class="status-dot" id="syncStatus"><i></i><span>ذخیره روی همین مرورگر</span></span>
+      <button class="btn accent" id="exportBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+        خروجی برای چاپ
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <form class="card composer" id="composer">
+      <label class="lbl" for="inbox">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+        هر چی تو ذهنته بنویس، فارسی یا تایلندی
+      </label>
+      <textarea id="inbox" dir="auto" placeholder="مثلاً: فردا ساعت ۱۰ جلسه با آقای رضایی درباره لوگو، تا پنجشنبه فاکتور پروژه سایت رو بفرستم، ۵ عصر به مامان زنگ بزنم…&#10;หรือ: พรุ่งนี้บ่ายสามโมงส่งงานออกแบบให้ลูกค้า"></textarea>
+      <div class="comp-row">
+        <div class="examples" id="examples"></div>
+        <div class="comp-row" style="gap:8px">
+          <span class="hint">Ctrl + Enter</span>
+          <button class="btn ghost" type="button" id="stopBtn" hidden>توقف</button>
+          <button class="btn primary" type="submit" id="sendBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+            مرتب کن و ثبت کن
+          </button>
+        </div>
+      </div>
+      <div class="thinking" id="thinking" hidden><span class="spin"></span><span id="thinkingText">Claude داره متنت رو می‌خونه و دسته‌بندی می‌کنه…</span></div>
+    </form>
+
+    <div class="side">
+      <div class="card ringcard">
+        <svg class="ring" viewBox="0 0 84 84" aria-hidden="true">
+          <circle class="bg" cx="42" cy="42" r="35"/>
+          <circle class="fg" id="ringFg" cx="42" cy="42" r="35" stroke-dasharray="219.9" stroke-dashoffset="219.9" transform="rotate(-90 42 42)"/>
+          <text x="42" y="49" text-anchor="middle" id="ringTxt">۰٪</text>
+        </svg>
+        <div class="stats">
+          <div class="k">کارهای امروز · <span lang="th">งานวันนี้</span></div>
+          <div class="v" id="todayCount">—</div>
+          <div class="row"><span class="pill bad" id="overdueCount">۰</span> عقب‌افتاده</div>
+          <div class="row"><span class="pill ok" id="weekCount">۰</span> تا ۷ روز آینده</div>
+        </div>
+      </div>
+      <div class="card next" id="nextCard"></div>
+    </div>
+  </section>
+
+  <section class="card reply" id="replyCard" hidden></section>
+
+  <nav class="bar">
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-view="today" aria-selected="true">امروز <span class="count" id="cToday"></span></button>
+      <button role="tab" data-view="upcoming" aria-selected="false">پیش رو <span class="count" id="cUp"></span></button>
+      <button role="tab" data-view="cats" aria-selected="false">دسته‌ها</button>
+      <button role="tab" data-view="notes" aria-selected="false">یادداشت‌ها <span class="count" id="cNotes"></span></button>
+      <button role="tab" data-view="done" aria-selected="false">انجام‌شده</button>
+    </div>
+    <div class="comp-row" style="gap:8px">
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="جستجو / ค้นหา" dir="auto"></label>
+      <div class="seg" id="langSeg" aria-label="زبان نمایش">
+        <button data-lang="both" aria-pressed="true">دو بخش</button>
+        <button data-lang="fa" aria-pressed="false">فارسی</button>
+        <button data-lang="th" aria-pressed="false" lang="th">ไทย</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="card plan" id="planCard" hidden></section>
+  <main class="panes" id="panes"></main>
+</div>
+
+<dialog id="editDlg"><form class="dlg" id="editForm" dir="rtl" lang="fa" method="dialog"></form></dialog>
+<dialog id="exportDlg"><div class="dlg" id="exportBox" dir="rtl" lang="fa"></div></dialog>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="alarmHost"></div>
+
+<script>
+(() => {
+"use strict";
+/* ---------- constants & helpers ---------- */
+const LKEY = "sarresid.items.v1", PKEY = "sarresid.prefs.v1", SYNCED = "sarresid.synced", NKEY = "sarresid.notified";
+const KINDS = ["task","event","reminder","note","payment"];
+const KIND_L = {
+  fa:{task:"کار",event:"قرار/جلسه",reminder:"یادآوری",note:"یادداشت",payment:"مالی"},
+  th:{task:"งาน",event:"นัดหมาย",reminder:"เตือนความจำ",note:"บันทึก",payment:"การเงิน"}
+};
+const CUR = { TOMAN:{fa:"تومان",th:"โทมาน"}, IRR:{fa:"ریال",th:"เรียล"}, THB:{fa:"بات",th:"บาท"}, USD:{fa:"دلار",th:"ดอลลาร์"}, EUR:{fa:"یورو",th:"ยูโร"} };
+const L = {
+  fa:{pane:"بخش فارسی", today:"امروز", overdue:"عقب‌افتاده", timed:"برنامه ساعتی", anytime:"هر وقت امروز", todayNotes:"یادداشت‌های امروز",
+      upcoming:"پیش رو", nodate:"بدون تاریخ", notes:"یادداشت‌ها", cats:"دسته‌ها", done:"انجام‌شده", now:"الان",
+      empty:"چیزی اینجا نیست. بالا بنویس چی کار داری تا مرتبش کنم.", emptyNotes:"هنوز یادداشتی نداری.", emptyDone:"هنوز کاری تیک نخورده.",
+      missing:"ترجمه ندارد", more:"مورد دیگر", plan:"پیشنهاد Claude برای امروز", high:"فوری"},
+  th:{pane:"ส่วนภาษาไทย", today:"วันนี้", overdue:"เลยกำหนด", timed:"ตามเวลา", anytime:"ทำได้ทั้งวัน", todayNotes:"บันทึกวันนี้",
+      upcoming:"กำลังจะมาถึง", nodate:"ไม่มีวันที่", notes:"บันทึก", cats:"หมวดหมู่", done:"เสร็จแล้ว", now:"ตอนนี้",
+      empty:"ยังไม่มีรายการ เขียนสิ่งที่ต้องทำด้านบนได้เลย", emptyNotes:"ยังไม่มีบันทึก", emptyDone:"ยังไม่มีงานที่เสร็จ",
+      missing:"ยังไม่มีคำแปล", more:"รายการอื่น", plan:"แผนวันนี้จาก Claude", high:"ด่วน"}
+};
+const ICON = {
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  task:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  event:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  reminder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>',
+  note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/></svg>',
+  payment:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>',
+  inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></svg>'
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toEn = s => String(s ?? "").replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[๐-๙]/g, d => "๐๑๒๓๔๕๖๗๘๙".indexOf(d));
+const faNum = s => String(s ?? "").replace(/\d/g, d => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const num = (s, lang) => lang === "fa" ? faNum(s) : String(s);
+const pad = n => String(n).padStart(2, "0");
+const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayISO = () => isoOf(new Date());
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return isoOf(d); };
+const nowHM = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const hmToMin = hm => { const [h, m] = hm.split(":").map(Number); return h * 60 + m; };
+const fmtCache = {};
+const fmt = (loc, opts) => fmtCache[loc + JSON.stringify(opts)] ||= new Intl.DateTimeFormat(loc, opts);
+function dateLabel(iso, lang, long = true) {
+  const d = new Date(iso + "T12:00:00");
+  if (lang === "fa") return fmt("fa-IR-u-ca-persian", long ? {weekday:"long", day:"numeric", month:"long"} : {day:"numeric", month:"long"}).format(d);
+  return fmt("th-TH", long ? {weekday:"long", day:"numeric", month:"long"} : {day:"numeric", month:"short"}).format(d);
+}
+function relLabel(iso, lang) {
+  const t = todayISO();
+  if (iso === t) return L[lang].today;
+  if (iso === addDays(t, 1)) return lang === "fa" ? "فردا" : "พรุ่งนี้";
+  if (iso === addDays(t, -1)) return lang === "fa" ? "دیروز" : "เมื่อวาน";
+  return null;
+}
+const hashHue = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.codePointAt(0)) >>> 0; return [210, 160, 28, 340, 265, 190, 120, 8, 300, 45][h % 10]; };
+const uid = () => "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const hasFa = s => /[؀-ۿ]/.test(s), hasTh = s => /[฀-๿]/.test(s);
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+/* ---------- field access (bilingual) ---------- */
+const tx = (it, f, lang) => it[f + "_" + lang] || "";
+const txAny = (it, f, lang) => tx(it, f, lang) || tx(it, f, lang === "fa" ? "th" : "fa");
+const catKey = it => (it.category_fa || it.category_th || "عمومی").trim();
+const catName = (it, lang) => txAny(it, "category", lang) || (lang === "fa" ? "عمومی" : "ทั่วไป");
+const actionable = it => it.kind !== "note";
+function amountText(it, lang) {
+  if (it.amount == null || it.amount === "" || isNaN(Number(it.amount))) return "";
+  const cur = CUR[it.currency] ? CUR[it.currency][lang] : (it.currency || "");
+  return Number(it.amount).toLocaleString(lang === "fa" ? "fa-IR" : "th-TH") + " " + cur;
+}
+
+/* ---------- state ---------- */
+const prefs = Object.assign({ view:"today", lang:"both" }, lsGet(PKEY, {}));
+const S = { items:new Map(), col:null, mode:"local", sample:null, downloads:null, busy:null, lastBatch:null, plan:null };
+
+/* ---------- storage ---------- */
+function loadLocal() { (lsGet(LKEY, []) || []).forEach(i => i && i.id && S.items.set(i.id, i)); }
+function saveLocal() { lsSet(LKEY, [...S.items.values()]); }
+async function connectCloud() {
+  if (!window.claude || !window.claude.use) return;
+  const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+  if (!db || !user) return;
+  let id = null; try { id = await user.id(); } catch {}
+  if (!id) return;
+  const col = db.doc("data/users/" + id + "/space").collection("items");
+  let snap; try { snap = await col.limit(1000).get(); } catch { return; }
+  const remote = new Map(snap.docs.map(d => [d.id, { ...d.data(), id:d.id }]));
+  if (!lsGet(SYNCED, false)) {
+    for (const [k, it] of S.items) if (!remote.has(k)) { try { await col.doc(k).set(clean(it)); remote.set(k, it); } catch {} }
+  }
+  lsSet(SYNCED, true);
+  S.col = col; S.mode = "cloud"; S.items = remote; saveLocal(); setSync(); render();
+  col.limit(1000).onSnapshot(s => { S.items = new Map(s.docs.map(d => [d.id, { ...d.data(), id:d.id }])); saveLocal(); render(); },
+    e => { if (e && e.code === "revoked") { S.col = null; S.mode = "local"; setSync(); } });
+}
+const clean = it => JSON.parse(JSON.stringify(it));
+async function putItem(it, quiet) {
+  it.updated = Date.now(); S.items.set(it.id, it); saveLocal(); if (!quiet) render();
+  if (S.col) { try { await S.col.doc(it.id).set(clean(it)); } catch (e) { toast(e && e.code === "quota_exceeded" ? "فضای ذخیره پر شده؛ چند مورد قدیمی رو پاک کن." : "ذخیره در فضای ابری انجام نشد؛ روی همین مرورگر نگه داشتم."); } }
+}
+async function removeItem(id, quiet) {
+  S.items.delete(id); saveLocal(); if (!quiet) render();
+  if (S.col) { try { await S.col.doc(id).delete(); } catch {} }
+}
+function setSync() {
+  const el = $("#syncStatus");
+  el.classList.toggle("on", S.mode === "cloud");
+  el.querySelector("span").textContent = S.mode === "cloud" ? "ذخیره در حساب Claude" : "ذخیره روی همین مرورگر";
+}
+
+/* ---------- Claude ---------- */
+function setAI(state) {
+  const el = $("#aiStatus");
+  el.classList.toggle("on", state === "on");
+  el.querySelector("span").textContent = state === "on" ? "Claude وصل است" : state === "off" ? "Claude در دسترس نیست · حالت ساده" : "در حال اتصال به Claude…";
+}
+function context() {
+  const now = new Date(), t = todayISO();
+  const cats = [...new Map([...S.items.values()].map(i => [catKey(i), [i.category_fa || "", i.category_th || ""]])).values()].slice(0, 40);
+  const open = [...S.items.values()].filter(i => !i.done && (i.kind !== "note" || (i.date && i.date >= addDays(t, -7))))
+    .sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999") || (a.time || "").localeCompare(b.time || "")).slice(0, 120)
+    .map(i => `${i.id} | ${i.kind} | ${i.date || "-"} | ${i.time || "-"} | ${i.title_fa || ""} / ${i.title_th || ""} | ${i.category_fa || ""}`).join("\n");
+  const week = [...Array(7)].map((_, k) => { const iso = addDays(t, k); return `${iso} = ${dateLabel(iso, "fa")} (Jalali) = ${new Date(iso + "T12:00").toLocaleDateString("en-US", {weekday:"long"})}`; }).join("\n");
+  return { now, t, cats, open, week };
+}
+function organizePrompt(text) {
+  const c = context();
+  return `You are the organizing brain of a personal bilingual planner for a busy freelancer who writes in Persian (Farsi) and Thai.
+Current local date-time: ${c.t} ${nowHM()} (${c.now.toLocaleDateString("en-US",{weekday:"long"})}). Jalali today: ${fmt("fa-IR-u-ca-persian",{year:"numeric",month:"long",day:"numeric"}).format(c.now)}.
+Next 7 days:
+${c.week}
+
+Existing categories [Persian, Thai]: ${JSON.stringify(c.cats)}
+Open items (id | kind | date | time | title fa / th | category):
+${c.open || "(none)"}
+
+The user's new message (Persian, Thai, or mixed; may contain many things at once):
+"""
+${text}
+"""
+
+Turn the message into structured changes for the planner.
+Rules:
+- Split the message into separate items, one action or one piece of information each. Do not drop anything the user wrote.
+- EVERY item must be fully bilingual: write the Persian version in *_fa fields and the Thai version in *_th fields, whichever language the user wrote in. Translate naturally; keep personal names, brand names and numbers recognisable.
+- kind: "task" (something to do), "event" (meeting/appointment/call at a set time), "reminder" (only needs remembering at a time), "note" (information or idea to keep, no action), "payment" (money to receive or pay).
+- date: Gregorian YYYY-MM-DD. Resolve relative words (امروز، فردا، پس‌فردا، weekdays like شنبه…جمعه = the next such day, هفته بعد, Jalali dates like ۱۵ مهر, Thai: วันนี้ พรุ่งนี้ มะรืนนี้ วันจันทร์… , Thai Buddhist-era years = Gregorian + 543). If a time is given without a date: today if that time is still ahead, otherwise tomorrow. Notes and undated tasks: null. "تا پنجشنبه"/deadline: that date.
+- time / end: 24h "HH:MM" or null. Persian: صبح=AM, ظهر≈12-14, عصر/بعدازظهر=PM, شب=PM. An hour 1-6 with no qualifier means PM; 7-11 with no qualifier means AM. Thai: โมงเช้า=AM, บ่าย X โมง = (12+X):00, X โมงเย็น = (12+X):00, ทุ่ม = (18+X):00, ตี X = X:00 AM.
+- category_fa / category_th: a short label (client or project name, or an area like شخصی/ส่วนตัว، مالی/การเงิน، خانه/บ้าน، سلامت/สุขภาพ، کاری/งาน). Reuse an existing category when it fits.
+- priority: "high" for urgent words (فوری، حتما، مهم، ددلاین، ด่วน، สำคัญ), "low" for "اگه وقت شد"/"ถ้ามีเวลา", otherwise "normal".
+- title_*: short, clear, ≤ 60 characters. Extra information goes in detail_* (or "" if none).
+- amount: a number or null; currency: "TOMAN", "IRR", "THB", "USD", "EUR" or null (guess THB for บาท/بات, TOMAN for تومان).
+- If the message asks to change existing items (move, rename, mark done, delete, "cancel"), use "update", "complete" or "remove" with ids from the open items list. Never invent ids.
+
+Reply with only this JSON:
+{"reply_fa":"1-2 short friendly Persian sentences on what you recorded; mention anything ambiguous you guessed",
+ "reply_th":"the same in Thai",
+ "add":[{"kind":"task","title_fa":"","title_th":"","detail_fa":"","detail_th":"","category_fa":"","category_th":"","date":null,"time":null,"end":null,"priority":"normal","amount":null,"currency":null}],
+ "update":[{"id":"...","changes":{}}],
+ "complete":[],
+ "remove":[]}`;
+}
+const okDate = v => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(toEn(v)) ? toEn(v) : null;
+const okTime = v => { if (typeof v !== "string") return null; const m = toEn(v).match(/^(\d{1,2}):(\d{2})/); return m && +m[1] < 24 && +m[2] < 60 ? pad(+m[1]) + ":" + m[2] : null; };
+function normalize(src, base = {}) {
+  const it = { ...base };
+  const s = (k) => typeof src[k] === "string" ? src[k].trim().slice(0, 600) : undefined;
+  for (const f of ["title","detail","category"]) for (const l of ["fa","th"]) { const v = s(f + "_" + l); if (v !== undefined) it[f + "_" + l] = v; }
+  if ("kind" in src) it.kind = KINDS.includes(src.kind) ? src.kind : "task";
+  if ("date" in src) it.date = okDate(src.date);
+  if ("time" in src) it.time = okTime(src.time);
+  if ("end" in src) it.end = okTime(src.end);
+  if ("priority" in src) it.priority = ["high","normal","low"].includes(src.priority) ? src.priority : "normal";
+  if ("amount" in src) { const n = src.amount == null || src.amount === "" ? null : Number(toEn(String(src.amount)).replace(/[,٬\s]/g, "")); it.amount = isFinite(n) ? n : null; }
+  if ("currency" in src) it.currency = typeof src.currency === "string" ? src.currency.toUpperCase().slice(0, 8) : null;
+  if ("done" in src) it.done = !!src.done;
+  return it;
+}
+function fallbackParse(text) {
+  const t = todayISO();
+  return text.split(/\n+|(?<=[.!؟?])\s+/).map(x => x.trim()).filter(Boolean).map(line => {
+    const en = toEn(line); let date = null, time = null;
+    if (/پس\s*‌?فردا|มะรืน/.test(line)) date = addDays(t, 2); else if (/فردا|พรุ่งนี้/.test(line)) date = addDays(t, 1); else if (/امروز|วันนี้/.test(line)) date = t;
+    const m = en.match(/(?:ساعت|เวลา)?\s*(\d{1,2})(?:[:٫.](\d{2}))?\s*(صبح|عصر|بعدازظهر|ظهر|شب)?/);
+    if (m && /ساعت|เวลา|:|صبح|عصر|شب/.test(m[0])) { let h = +m[1]; if (/عصر|بعدازظهر|شب/.test(m[3] || "") && h < 12) h += 12; else if (!m[3] && h >= 1 && h <= 6) h += 12; if (h < 24) time = pad(h) + ":" + (m[2] || "00"); }
+    if (time && !date) date = hmToMin(time) > hmToMin(nowHM()) ? t : addDays(t, 1);
+    return { id:uid(), kind: time ? "event" : "task", title_fa: hasTh(line) && !hasFa(line) ? "" : line.slice(0, 120), title_th: hasTh(line) ? line.slice(0, 120) : "",
+      detail_fa:"", detail_th:"", category_fa:"عمومی", category_th:"ทั่วไป", date, time, end:null, priority: /فوری|حتما|ด่วน/.test(line) ? "high" : "normal", amount:null, currency:null, done:false, created:Date.now() };
+  });
+}
+
+let ctl = null;
+async function organize(text) {
+  text = text.trim(); if (!text || S.busy) return;
+  const batch = { added:[], before:[], replyFa:"", replyTh:"" };
+  if (!S.sample) {
+    const items = fallbackParse(text);
+    for (const it of items) { batch.added.push(it.id); putItem(it, true); }
+    batch.replyFa = `${faNum(items.length)} مورد ثبت شد. Claude به این صفحه وصل نیست، پس دسته‌بندی و ترجمه تایلندی انجام نشد. می‌تونی هر مورد رو باز کنی و دستی کاملش کنی.`;
+    batch.replyTh = `บันทึก ${items.length} รายการแล้ว (ยังไม่ได้เชื่อมต่อ Claude จึงยังไม่ได้แปลและจัดหมวดหมู่)`;
+    $("#inbox").value = ""; finishBatch(batch); return;
+  }
+  S.busy = "organize"; ctl = new AbortController(); setBusy(true);
+  try {
+    const res = await S.sample.json(organizePrompt(text), { signal:ctl.signal, cache:false });
+    if (!res || typeof res !== "object") throw { code:"invalid_json" };
+    for (const raw of Array.isArray(res.add) ? res.add : []) {
+      if (!raw || typeof raw !== "object") continue;
+      const it = normalize(raw, { id:uid(), kind:"task", title_fa:"", title_th:"", detail_fa:"", detail_th:"", category_fa:"", category_th:"", date:null, time:null, end:null, priority:"normal", amount:null, currency:null, done:false, created:Date.now(), source:text.slice(0, 500) });
+      if (!it.title_fa && !it.title_th) continue;
+      batch.added.push(it.id); putItem(it, true);
+    }
+    for (const u of Array.isArray(res.update) ? res.update : []) {
+      const cur = u && S.items.get(String(u.id)); if (!cur || !u.changes) continue;
+      batch.before.push(clean(cur)); putItem(normalize(u.changes, cur), true);
+    }
+    for (const id of Array.isArray(res.complete) ? res.complete : []) {
+      const cur = S.items.get(String(id)); if (!cur) continue;
+      batch.before.push(clean(cur)); putItem({ ...cur, done:true }, true);
+    }
+    for (const id of Array.isArray(res.remove) ? res.remove : []) {
+      const cur = S.items.get(String(id)); if (!cur) continue;
+      batch.before.push(clean(cur)); removeItem(cur.id, true);
+    }
+    batch.replyFa = String(res.reply_fa || "ثبت شد."); batch.replyTh = String(res.reply_th || "บันทึกแล้ว");
+    $("#inbox").value = ""; lsSet("sarresid.draft", "");
+    finishBatch(batch);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "cancelled") toast("متوقف شد. متنت سر جاشه.");
+    else if (["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(code)) { S.sample = null; setAI("off"); toast("اجازه استفاده از Claude داده نشد. با حالت ساده ثبت می‌کنم."); S.busy = null; setBusy(false); return organize(text); }
+    else if (code === "rate_limited") toast("Claude الان سرش شلوغه. چند لحظه دیگه دوباره بزن.");
+    else if (code === "invalid_json") toast("جواب Claude قابل خواندن نبود. یه بار دیگه امتحان کن.");
+    else if (code === "session_expired") toast("باید دوباره وارد حساب Claude بشی.");
+    else toast("ارتباط با Claude قطع شد. متنت سر جاشه، دوباره امتحان کن.");
+  } finally { S.busy = null; setBusy(false); }
+}
+function setBusy(on) {
+  $("#thinking").hidden = !on; $("#stopBtn").hidden = !on; $("#sendBtn").disabled = on;
+}
+function finishBatch(batch) {
+  S.lastBatch = batch; render(); renderReply();
+}
+function renderReply() {
+  const b = S.lastBatch, el = $("#replyCard");
+  if (!b) { el.hidden = true; return; }
+  el.hidden = false;
+  const n = b.added.length, m = b.before.length;
+  el.innerHTML = `<div class="reply-head"><b>${ICON.check.replace('<svg','<svg width="18" height="18" style="color:var(--good)"')} ${faNum(n)} مورد تازه${m ? ` · ${faNum(m)} مورد تغییر کرد` : ""}</b>
+    <span class="comp-row" style="gap:6px"><button class="btn ghost" type="button" data-act="undo-batch">برگردون</button><button class="btn ghost" type="button" data-act="close-reply" aria-label="بستن">✕</button></span></div>
+    <div class="duo"><div dir="rtl" lang="fa"><span class="tag">فارسی</span>${esc(b.replyFa)}</div><div dir="ltr" lang="th"><span class="tag">ไทย</span>${esc(b.replyTh)}</div></div>`;
+}
+async function undoBatch() {
+  const b = S.lastBatch; if (!b) return;
+  for (const id of b.added) removeItem(id, true);
+  for (const it of b.before) putItem(it, true);
+  S.lastBatch = null; render(); renderReply(); toast("برگردونده شد.");
+}
+
+async function translateItem(it) {
+  if (!S.sample) throw { code:"not_granted" };
+  const res = await S.sample.json(`Translate this planner item so it has both a Persian (Farsi) and a Thai version. Keep existing text unless it is empty; fill the empty fields by translating from the other language. Keep names and numbers recognisable. Titles ≤ 60 characters.
+Item: ${JSON.stringify({title_fa:it.title_fa,title_th:it.title_th,detail_fa:it.detail_fa,detail_th:it.detail_th,category_fa:it.category_fa,category_th:it.category_th})}
+Reply with only JSON with the same six keys.`, { modelTier:"quick" });
+  return normalize(res || {}, it);
+}
+
+async function planDay() {
+  if (!S.sample || S.busy) return;
+  const t = todayISO();
+  const list = [...S.items.values()].filter(i => !i.done && actionable(i) && (i.date === t || (i.date && i.date < t) || (!i.date && i.kind === "task")))
+    .map(i => `${i.time || "--:--"} ${i.title_fa || i.title_th} [${i.category_fa || ""}] ${i.priority === "high" ? "(urgent)" : ""} ${i.date && i.date < t ? "(overdue since " + i.date + ")" : ""}`).join("\n");
+  if (!list) { toast("برای امروز کاری نداری که برنامه‌ریزی بشه."); return; }
+  S.busy = "plan"; S.plan = { fa:"", th:"", loading:true }; renderPlan();
+  try {
+    const res = await S.sample.json(`It is ${nowHM()} on ${t}. Here are a busy freelancer's open tasks for today (timed ones are fixed appointments):
+${list}
+Suggest a realistic order for the rest of the day: keep fixed times, put urgent and overdue things early, group small tasks, add short breaks. Max 8 short lines, each starting with an approximate time.
+Reply with only JSON: {"fa":"the plan in Persian, one line per step","th":"the same plan in Thai"}`);
+    S.plan = { fa:String(res.fa || ""), th:String(res.th || "") };
+  } catch (e) { S.plan = null; if (e && e.code !== "cancelled") toast("پیشنهاد برنامه آماده نشد. دوباره امتحان کن."); }
+  finally { S.busy = null; renderPlan(); }
+}
+function renderPlan() {
+  const el = $("#planCard");
+  if (!S.plan || prefs.view !== "today") { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = S.plan.loading
+    ? `<div class="thinking"><span class="spin"></span>Claude داره برای امروزت برنامه می‌چینه…</div>`
+    : `<div class="reply-head"><b>${L.fa.plan} · <span lang="th">${L.th.plan}</span></b><button class="btn ghost" type="button" data-act="close-plan" aria-label="بستن">✕</button></div>
+       <div class="duo"><div dir="rtl" lang="fa">${esc(S.plan.fa)}</div><div dir="ltr" lang="th">${esc(S.plan.th)}</div></div>`;
+}
+
+/* ---------- views ---------- */
+const q = () => toEn($("#q").value.trim().toLowerCase());
+function matches(it) {
+  const s = q(); if (!s) return true;
+  return ["title_fa","title_th","detail_fa","detail_th","category_fa","category_th"].some(f => toEn(it[f] || "").toLowerCase().includes(s));
+}
+const all = () => [...S.items.values()].filter(matches);
+const byTime = (a, b) => (a.date || "9999").localeCompare(b.date || "9999") || (a.time || "99").localeCompare(b.time || "99") || (a.created || 0) - (b.created || 0);
+
+function itemHTML(it, lang, opts = {}) {
+  const h = hashHue(catKey(it));
+  const title = tx(it, "title", lang), detail = tx(it, "detail", lang);
+  const other = lang === "fa" ? "th" : "fa";
+  const meta = [];
+  if (opts.showDate && it.date) meta.push(`<span>${esc(relLabel(it.date, lang) || dateLabel(it.date, lang, false))}</span>`);
+  if (opts.showTime !== false && it.time) meta.push(`<span dir="ltr" style="font-variant-numeric:tabular-nums">${num(it.time + (it.end ? "–" + it.end : ""), lang)}</span>`);
+  meta.push(`<span class="kind">${ICON[it.kind] || ICON.task}${KIND_L[lang][it.kind] || ""}</span>`);
+  meta.push(`<span class="chip" style="--h:${h}">${esc(catName(it, lang))}</span>`);
+  if (it.priority === "high") meta.push(`<span class="kind" style="color:var(--bad)">${ICON.flag}${L[lang].high}</span>`);
+  const amt = amountText(it, lang); if (amt) meta.push(`<span class="amount">${esc(amt)}</span>`);
+  return `<div class="item ${it.done ? "done" : ""} ${it.priority === "high" && !it.done ? "prio-high" : ""}" style="--h:${h}" data-id="${esc(it.id)}">
+    ${actionable(it) ? `<button class="check" type="button" data-act="toggle" aria-label="${lang === "fa" ? "انجام شد" : "เสร็จแล้ว"}">${ICON.check}</button>` : `<span class="kind" style="margin-top:3px;color:hsl(${h} 50% 50%)">${ICON.note}</span>`}
+    <div class="body" data-act="edit">
+      <div class="ttl">${title ? esc(title) : `<span lang="${other}">${esc(tx(it, "title", other))}</span> <span class="missing">· ${L[lang].missing}</span>`}</div>
+      <div class="meta">${meta.join("")}</div>
+      ${detail ? `<div class="detail">${esc(detail)}</div>` : ""}
+    </div>
+    <button class="ibtn" type="button" data-act="edit" aria-label="ویرایش">${ICON.edit}</button>
+  </div>`;
+}
+function emptyHTML(lang, key = "empty") { return `<div class="empty">${ICON.inbox}<span>${L[lang][key]}</span></div>`; }
+
+function viewToday(lang) {
+  const t = todayISO(), items = all();
+  const overdue = items.filter(i => !i.done && actionable(i) && i.date && i.date < t).sort(byTime);
+  const today = items.filter(i => i.date === t);
+  const timed = today.filter(i => i.time && actionable(i)).sort(byTime);
+  const anytime = items.filter(i => actionable(i) && ((i.date === t && !i.time) || (!i.date && !i.done && i.priority === "high"))).sort((a, b) => a.done - b.done || byTime(a, b));
+  const notes = today.filter(i => i.kind === "note");
+  let html = "";
+  if (overdue.length) html += `<div class="sec overdue"><h3>${L[lang].overdue} · ${num(overdue.length, lang)}</h3>${overdue.map(i => itemHTML(i, lang, { showDate:true })).join("")}</div>`;
+  if (timed.length) {
+    const nowMin = hmToMin(nowHM()); let nowPlaced = false, rows = "";
+    for (const it of timed) {
+      const m = hmToMin(it.time);
+      if (!nowPlaced && m > nowMin) { rows += `<div class="now"><span>${num(nowHM(), lang)}</span><i></i></div>`; nowPlaced = true; }
+      rows += `<div class="tl-row ${m < nowMin ? "past" : ""}" style="--h:${hashHue(catKey(it))}"><div class="tl-time">${num(it.time, lang)}</div><div class="tl-axis"></div>${itemHTML(it, lang, { showTime: !!it.end })}</div>`;
+    }
+    if (!nowPlaced) rows += `<div class="now"><span>${num(nowHM(), lang)}</span><i></i></div>`;
+    html += `<div class="sec"><h3>${L[lang].timed}</h3><div class="tl">${rows}</div></div>`;
+  }
+  if (anytime.length) html += `<div class="sec"><h3>${L[lang].anytime}</h3>${anytime.map(i => itemHTML(i, lang, { showDate: i.date !== t })).join("")}</div>`;
+  if (notes.length) html += `<div class="sec"><h3>${L[lang].todayNotes}</h3>${notes.map(i => itemHTML(i, lang)).join("")}</div>`;
+  return html || emptyHTML(lang);
+}
+function viewUpcoming(lang) {
+  const t = todayISO(), items = all().filter(i => !i.done && i.kind !== "note");
+  const dated = items.filter(i => i.date && i.date > t).sort(byTime);
+  const groups = new Map(); dated.forEach(i => { if (!groups.has(i.date)) groups.set(i.date, []); groups.get(i.date).push(i); });
+  let html = "";
+  for (const [d, list] of groups) html += `<div class="sec"><h3>${esc(relLabel(d, lang) ? relLabel(d, lang) + " · " : "")}${esc(dateLabel(d, lang))}</h3>${list.map(i => itemHTML(i, lang)).join("")}</div>`;
+  const nod = items.filter(i => !i.date).sort(byTime);
+  if (nod.length) html += `<div class="sec"><h3>${L[lang].nodate}</h3>${nod.map(i => itemHTML(i, lang)).join("")}</div>`;
+  return html || emptyHTML(lang);
+}
+function viewCats(lang) {
+  const groups = new Map();
+  all().forEach(i => { const k = catKey(i); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
+  if (!groups.size) return emptyHTML(lang);
+  const cards = [...groups.entries()].sort((a, b) => b[1].filter(i => !i.done).length - a[1].filter(i => !i.done).length).map(([k, list]) => {
+    list.sort((a, b) => a.done - b.done || byTime(a, b));
+    const open = list.filter(i => !i.done).length, shown = list.slice(0, 8);
+    return `<div class="cat" style="--h:${hashHue(k)}"><div class="cat-h"><b><i></i>${esc(catName(list[0], lang))}</b><span class="pill ok">${num(open, lang)}</span></div>
+      <ul>${shown.map(i => `<li class="${i.done ? "done" : ""}" data-id="${esc(i.id)}" data-act="edit"><em>${i.date ? esc(dateLabel(i.date, lang, false)) : "•"}</em><span>${esc(txAny(i, "title", lang))}</span></li>`).join("")}</ul>
+      ${list.length > 8 ? `<small class="hint">+ ${num(list.length - 8, lang)} ${L[lang].more}</small>` : ""}</div>`;
+  });
+  return `<div class="cats">${cards.join("")}</div>`;
+}
+function viewNotes(lang) {
+  const notes = all().filter(i => i.kind === "note").sort((a, b) => (b.created || 0) - (a.created || 0));
+  if (!notes.length) return emptyHTML(lang, "emptyNotes");
+  return `<div class="notes">${notes.map(n => `<div class="note" style="--h:${hashHue(catKey(n))}" data-id="${esc(n.id)}" data-act="edit">
+    <b>${esc(txAny(n, "title", lang))}</b>${tx(n, "detail", lang) ? `<p>${esc(tx(n, "detail", lang))}</p>` : ""}
+    <small>${esc(catName(n, lang))}${n.date ? " · " + esc(dateLabel(n.date, lang, false)) : ""}</small></div>`).join("")}</div>`;
+}
+function viewDone(lang) {
+  const list = all().filter(i => i.done).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 150);
+  return list.length ? `<div class="sec">${list.map(i => itemHTML(i, lang, { showDate:true })).join("")}</div>` : emptyHTML(lang, "emptyDone");
+}
+const VIEWS = { today:viewToday, upcoming:viewUpcoming, cats:viewCats, notes:viewNotes, done:viewDone };
+const VIEW_T = { today:"today", upcoming:"upcoming", cats:"cats", notes:"notes", done:"done" };
+
+function render() {
+  const langs = prefs.lang === "both" ? ["fa","th"] : [prefs.lang];
+  const panes = $("#panes");
+  panes.classList.toggle("single", langs.length === 1);
+  panes.innerHTML = langs.map(l => `<section class="card pane" lang="${l}" dir="${l === "fa" ? "rtl" : "ltr"}">
+      <div class="pane-head"><h2>${L[l][VIEW_T[prefs.view]]}${prefs.view === "today" ? ` · <span style="font-weight:500;color:var(--muted);font-size:14px">${esc(dateLabel(todayISO(), l))}</span>` : ""}</h2>
+        <span class="comp-row" style="gap:6px">${prefs.view === "today" && l === langs[0] && S.sample ? `<button class="btn ghost" type="button" data-act="plan" style="padding:5px 10px;font-size:13px">${l === "fa" ? "برنامه امروز رو بچین" : "จัดแผนวันนี้"}</button>` : ""}<span class="flag">${l === "fa" ? "فارسی" : "ภาษาไทย"}</span></span></div>
+      ${VIEWS[prefs.view](l)}</section>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.view === prefs.view)));
+  document.querySelectorAll("#langSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === prefs.lang)));
+  renderStats(); renderPlan();
+}
+function renderStats() {
+  const t = todayISO(), items = [...S.items.values()];
+  const today = items.filter(i => i.date === t && actionable(i));
+  const done = today.filter(i => i.done).length, total = today.length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  $("#ringFg").setAttribute("stroke-dashoffset", String(219.9 * (1 - pct / 100)));
+  $("#ringTxt").textContent = faNum(pct) + "٪";
+  $("#todayCount").textContent = total ? `${faNum(done)} از ${faNum(total)} انجام شد` : "برای امروز چیزی نیست";
+  $("#overdueCount").textContent = faNum(items.filter(i => !i.done && actionable(i) && i.date && i.date < t).length);
+  $("#weekCount").textContent = faNum(items.filter(i => !i.done && actionable(i) && i.date && i.date > t && i.date <= addDays(t, 7)).length);
+  $("#cToday").textContent = total ? faNum(total - done) : "";
+  $("#cUp").textContent = faNum(items.filter(i => !i.done && actionable(i) && i.date && i.date > t).length || "") ;
+  $("#cNotes").textContent = faNum(items.filter(i => i.kind === "note").length || "");
+  // next up
+  const nowM = hmToMin(nowHM());
+  const next = items.filter(i => !i.done && i.date === t && i.time && hmToMin(i.time) >= nowM - 5).sort(byTime)[0]
+    || items.filter(i => !i.done && i.date && i.date > t && i.time).sort(byTime)[0];
+  const el = $("#nextCard");
+  if (!next) { el.innerHTML = `<span class="eyebrow">کار بعدی · <span lang="th">ถัดไป</span></span><div class="ti" style="color:var(--muted);font-weight:500">فعلاً قرار ساعت‌داری نداری.</div>`; return; }
+  let cd = "";
+  if (next.date === t) { const diff = hmToMin(next.time) - nowM; cd = diff <= 0 ? "همین الان" : diff < 60 ? `${faNum(diff)} دقیقه دیگه` : `${faNum(Math.floor(diff / 60))} ساعت و ${faNum(diff % 60)} دقیقه دیگه`; }
+  else cd = relLabel(next.date, "fa") || dateLabel(next.date, "fa");
+  el.innerHTML = `<span class="eyebrow">کار بعدی · <span lang="th">ถัดไป</span></span><div class="t">${faNum(next.time)}</div>
+    <div class="ti">${esc(txAny(next, "title", "fa"))}</div><div class="th" lang="th">${esc(tx(next, "title", "th"))}</div><div class="cd">${esc(cd)}</div>`;
+}
+
+/* ---------- edit dialog ---------- */
+let editing = null;
+function openEdit(id) {
+  const it = id ? S.items.get(id) : null; if (id && !it) return;
+  editing = it ? clean(it) : { id:uid(), kind:"task", title_fa:"", title_th:"", detail_fa:"", detail_th:"", category_fa:"", category_th:"", date:todayISO(), time:null, end:null, priority:"normal", amount:null, currency:null, done:false, created:Date.now() };
+  const e = editing, f = $("#editForm");
+  f.innerHTML = `<div class="dlg-h"><h2>${it ? "ویرایش مورد" : "مورد تازه"}</h2><button class="btn ghost" type="button" data-act="close-edit" aria-label="بستن">✕</button></div>
+    <div class="grid4">
+      <label class="fld"><span>نوع</span><select id="e-kind">${KINDS.map(k => `<option value="${k}" ${e.kind === k ? "selected" : ""}>${KIND_L.fa[k]} · ${KIND_L.th[k]}</option>`).join("")}</select></label>
+      <label class="fld"><span>تاریخ (میلادی)</span><input id="e-date" type="date" value="${e.date || ""}"></label>
+      <label class="fld"><span>ساعت</span><input id="e-time" type="time" value="${e.time || ""}"></label>
+      <label class="fld"><span>تا ساعت</span><input id="e-end" type="time" value="${e.end || ""}"></label>
+    </div>
+    <div class="hint" id="e-jalali"></div>
+    <div class="grid2">
+      <div class="fld" style="gap:10px">
+        <label class="fld"><span>عنوان فارسی</span><input id="e-title_fa" dir="rtl" value="${esc(e.title_fa)}"></label>
+        <label class="fld"><span>دسته فارسی</span><input id="e-category_fa" dir="rtl" value="${esc(e.category_fa)}" list="catsFa"></label>
+        <label class="fld"><span>توضیح فارسی</span><textarea id="e-detail_fa" dir="rtl">${esc(e.detail_fa)}</textarea></label>
+      </div>
+      <div class="fld" style="gap:10px" lang="th">
+        <label class="fld"><span>ชื่อรายการ (ไทย)</span><input id="e-title_th" dir="ltr" value="${esc(e.title_th)}"></label>
+        <label class="fld"><span>หมวดหมู่ (ไทย)</span><input id="e-category_th" dir="ltr" value="${esc(e.category_th)}" list="catsTh"></label>
+        <label class="fld"><span>รายละเอียด (ไทย)</span><textarea id="e-detail_th" dir="ltr">${esc(e.detail_th)}</textarea></label>
+      </div>
+    </div>
+    <datalist id="catsFa">${[...new Set([...S.items.values()].map(i => i.category_fa).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join("")}</datalist>
+    <datalist id="catsTh">${[...new Set([...S.items.values()].map(i => i.category_th).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join("")}</datalist>
+    <div class="grid4">
+      <label class="fld"><span>اولویت</span><select id="e-priority"><option value="high" ${e.priority === "high" ? "selected" : ""}>فوری</option><option value="normal" ${e.priority === "normal" ? "selected" : ""}>معمولی</option><option value="low" ${e.priority === "low" ? "selected" : ""}>هر وقت شد</option></select></label>
+      <label class="fld"><span>مبلغ</span><input id="e-amount" inputmode="decimal" value="${e.amount ?? ""}"></label>
+      <label class="fld"><span>واحد پول</span><select id="e-currency"><option value="">—</option>${Object.keys(CUR).map(c => `<option value="${c}" ${e.currency === c ? "selected" : ""}>${CUR[c].fa} · ${CUR[c].th}</option>`).join("")}</select></label>
+      <label class="fld"><span>وضعیت</span><select id="e-done"><option value="0">باز</option><option value="1" ${e.done ? "selected" : ""}>انجام شد</option></select></label>
+    </div>
+    <div class="dlg-f">
+      <div class="grp">${it ? `<button class="btn ghost danger" type="button" data-act="delete">حذف</button>` : ""}
+        ${S.sample ? `<button class="btn" type="button" data-act="translate" id="trBtn">ترجمه خودکار جاهای خالی</button>` : ""}</div>
+      <div class="grp"><button class="btn" type="button" data-act="close-edit">انصراف</button><button class="btn primary" type="submit">ذخیره</button></div>
+    </div>`;
+  const updJ = () => { const v = $("#e-date").value; $("#e-jalali").textContent = v ? `${dateLabel(v, "fa")} · ${dateLabel(v, "th")}` : "بدون تاریخ"; };
+  $("#e-date").addEventListener("input", updJ); updJ();
+  $("#editDlg").showModal();
+}
+function readEdit() {
+  const g = id => $("#e-" + id).value;
+  return normalize({ kind:g("kind"), date:g("date") || null, time:g("time") || null, end:g("end") || null, priority:g("priority"),
+    title_fa:g("title_fa"), title_th:g("title_th"), detail_fa:g("detail_fa"), detail_th:g("detail_th"), category_fa:g("category_fa"), category_th:g("category_th"),
+    amount:g("amount"), currency:g("currency") || null, done:g("done") === "1" }, editing);
+}
+
+/* ---------- export (A4: half Persian, half Thai) ---------- */
+const EXPORT_CSS = `
+.x-page,.x-page *{box-sizing:border-box}
+.x-page{width:210mm;height:297mm;background:#fff;color:#1a1f2e;position:relative;overflow:hidden;display:flex;margin:0 auto;page-break-after:always;break-after:page}
+.x-page:last-child{page-break-after:auto;break-after:auto}
+.x-page.x-tb{flex-direction:column}
+.x-page.x-lr{flex-direction:row-reverse}
+.x-half{display:flex;flex-direction:column;padding:9mm 11mm 8mm;overflow:hidden;position:relative;font-size:10.5pt;line-height:1.45}
+.x-tb .x-half{height:148.5mm;width:210mm}
+.x-lr .x-half{width:105mm;height:297mm;padding:10mm 8mm}
+.x-half[lang=fa]{font-family:"Vazirmatn",Tahoma,sans-serif;direction:rtl;text-align:right}
+.x-half[lang=th]{font-family:"Sarabun","Leelawadee UI",Tahoma,sans-serif;direction:ltr;text-align:left}
+.x-cut{position:absolute;z-index:2;border:0 dashed #9aa3b5}
+.x-tb .x-cut{left:6mm;right:6mm;top:148.5mm;border-top-width:.35mm}
+.x-lr .x-cut{top:6mm;bottom:6mm;left:105mm;border-left-width:.35mm}
+.x-cut svg{position:absolute;width:5mm;height:5mm;color:#9aa3b5;background:#fff}
+.x-tb .x-cut svg{left:-1mm;top:-2.6mm}
+.x-lr .x-cut svg{top:-1mm;left:-2.6mm;transform:rotate(90deg)}
+.x-head{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm;border-bottom:.6mm solid #22305c;padding-bottom:2mm;margin-bottom:3mm}
+.x-head h1{margin:0;font-size:16pt;line-height:1.15;color:#22305c;font-weight:800}
+.x-half[lang=th] .x-head h1{font-weight:700}
+.x-head .x-range{font-size:9pt;color:#5b6580}
+.x-head .x-lang{font-size:8pt;border:.3mm solid #c5cbd8;border-radius:1.5mm;padding:0 2mm;color:#5b6580;white-space:nowrap}
+.x-body{flex:1;overflow:hidden}
+.x-foot{font-size:7.5pt;color:#8a93a8;display:flex;justify-content:space-between;padding-top:1.5mm}
+.x-day{font-weight:800;font-size:10.5pt;color:#22305c;background:#eef1f7;border-radius:1.5mm;padding:.8mm 2.5mm;margin:2.5mm 0 1.2mm}
+.x-half[lang=th] .x-day{font-weight:700}
+.x-row{display:flex;gap:2.5mm;align-items:flex-start;padding:1.1mm 0;border-bottom:.2mm solid #e3e7ef}
+.x-box{width:3.6mm;height:3.6mm;border:.35mm solid #5b6580;border-radius:.8mm;flex:none;margin-top:.9mm}
+.x-row.x-done .x-box{background:#5b6580}
+.x-row.x-done .x-t{text-decoration:line-through;color:#8a93a8}
+.x-note .x-box{border-style:dotted}
+.x-time{flex:none;min-width:11mm;unicode-bidi:isolate;font-weight:700;font-variant-numeric:tabular-nums;color:#22305c}
+.x-main{flex:1;min-width:0}
+.x-t{font-weight:600}
+.x-hi{color:#c03b3b;font-weight:800}
+.x-m{font-size:8.5pt;color:#5b6580}
+.x-d{font-size:8.5pt;color:#3d4560;white-space:pre-wrap}
+.x-lines{margin-top:3mm}
+.x-lines div{border-bottom:.2mm solid #d3d8e3;height:6.5mm}
+`;
+const SCISSORS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/></svg>';
+const exp = Object.assign({ range:"today", from:"", to:"", notes:true, done:false, layout:"tb", lines:true }, lsGet("sarresid.export", {}));
+
+function exportSelection() {
+  const t = todayISO();
+  let from = t, to = t, label;
+  if (exp.range === "tomorrow") { from = to = addDays(t, 1); }
+  else if (exp.range === "week") { to = addDays(t, 6); }
+  else if (exp.range === "custom") { from = exp.from || t; to = exp.to || from; if (to < from) [from, to] = [to, from]; }
+  const inRange = i => i.date && i.date >= from && i.date <= to;
+  let items = [...S.items.values()].filter(i => {
+    if (!exp.done && i.done) return false;
+    if (i.kind === "note") return exp.notes && (inRange(i) || (!i.date && exp.range !== "custom"));
+    if (exp.range === "open") return !i.done || exp.done;
+    return inRange(i) || (exp.range !== "custom" && from === t && !i.done && ((i.date && i.date < t) || (!i.date && i.priority === "high")));
+  }).sort(byTime);
+  if (exp.range === "open") { from = null; to = null; }
+  return { items, from, to };
+}
+function exportRows(sel) {
+  const t = todayISO(), rows = [];
+  const acts = sel.items.filter(actionable), notes = sel.items.filter(i => i.kind === "note");
+  const groups = new Map();
+  for (const i of acts) { const k = !i.date ? "nodate" : (i.date < (sel.from || t) && !i.done) ? "overdue" : i.date; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); }
+  const order = [...groups.keys()].sort((a, b) => (a === "overdue" ? -1 : b === "overdue" ? 1 : a === "nodate" ? 1 : b === "nodate" ? -1 : a.localeCompare(b)));
+  for (const k of order) { rows.push({ type:"day", key:k }); groups.get(k).forEach(i => rows.push({ type:"item", it:i })); }
+  if (notes.length) { rows.push({ type:"day", key:"notes" }); notes.forEach(i => rows.push({ type:"item", it:i })); }
+  return rows;
+}
+function rowHTML(r, lang) {
+  if (r.type === "day") {
+    const k = r.key, lbl = k === "overdue" ? L[lang].overdue : k === "nodate" ? L[lang].nodate : k === "notes" ? L[lang].notes : (relLabel(k, lang) ? relLabel(k, lang) + " · " : "") + dateLabel(k, lang);
+    return `<div class="x-day">${esc(lbl)}</div>`;
+  }
+  const it = r.it, title = txAny(it, "title", lang), det = tx(it, "detail", lang), amt = amountText(it, lang);
+  const meta = [KIND_L[lang][it.kind], catName(it, lang)]; if (amt) meta.push(amt);
+  return `<div class="x-row ${it.done ? "x-done" : ""} ${it.kind === "note" ? "x-note" : ""}"><span class="x-box"></span>
+    <span class="x-time" dir="ltr">${it.time ? num(it.time + (it.end ? "–" + it.end : ""), lang) : "—"}</span>
+    <div class="x-main"><div class="x-t">${it.priority === "high" ? `<span class="x-hi">! </span>` : ""}${esc(title)}</div><div class="x-m">${esc(meta.join(" · "))}</div>${det ? `<div class="x-d">${esc(det)}</div>` : ""}</div></div>`;
+}
+function rangeText(sel, lang) {
+  if (!sel.from) return lang === "fa" ? "همه کارهای باز" : "งานที่ยังค้างทั้งหมด";
+  const a = dateLabel(sel.from, lang), b = dateLabel(sel.to, lang);
+  return sel.from === sel.to ? a : `${a} – ${b}`;
+}
+function headHTML(sel, lang, page, pages) {
+  const title = lang === "fa" ? "برنامه کارها" : "รายการงาน";
+  const y = lang === "fa" ? fmt("fa-IR-u-ca-persian", {year:"numeric"}).format(new Date((sel.from || todayISO()) + "T12:00")) : fmt("th-TH", {year:"numeric"}).format(new Date((sel.from || todayISO()) + "T12:00"));
+  return `<div class="x-head"><div><h1>${title}</h1><div class="x-range">${esc(rangeText(sel, lang))} · ${esc(y)}</div></div><span class="x-lang">${lang === "fa" ? "فارسی" : "ภาษาไทย"}${pages > 1 ? " · " + num(page + "/" + pages, lang) : ""}</span></div>`;
+}
+async function paginate(rows, layout, sel) {
+  try { await document.fonts.ready; } catch {}
+  const host = document.createElement("div");
+  host.style.cssText = "position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none";
+  host.innerHTML = `<style>${EXPORT_CSS}</style><div class="x-page x-${layout}">${["fa","th"].map(l => `<div class="x-half" lang="${l}">${headHTML(sel, l, 1, 2)}<div class="x-body"></div><div class="x-foot"><span>.</span></div></div>`).join("")}</div>`;
+  document.body.append(host);
+  const bodies = [...host.querySelectorAll(".x-body")];
+  const cap = Math.min(...bodies.map(b => b.clientHeight)) - (exp.lines ? 0 : 0);
+  const hs = rows.map(r => Math.max(...bodies.map((b, k) => { b.innerHTML = rowHTML(r, k ? "th" : "fa"); const el = b.firstElementChild; const cs = getComputedStyle(el); return el.offsetHeight + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom); })));
+  host.remove();
+  const pages = []; let cur = [], used = 0;
+  for (let k = 0; k < rows.length; k++) {
+    let need = hs[k];
+    if (rows[k].type === "day" && k + 1 < rows.length) need += hs[k + 1];
+    if (cur.length && used + need > cap) { pages.push(cur); cur = []; used = 0; }
+    cur.push(rows[k]); used += hs[k];
+  }
+  if (cur.length || !pages.length) pages.push(cur);
+  return { pages, cap, lastUsed: used };
+}
+async function buildExport() {
+  const sel = exportSelection(), rows = exportRows(sel);
+  const { pages } = await paginate(rows, exp.layout, sel);
+  const half = (l, rs, p) => `<div class="x-half" lang="${l}">${headHTML(sel, l, p + 1, pages.length)}<div class="x-body">${rs.length ? rs.map(r => rowHTML(r, l)).join("") : `<div class="x-m" style="padding:4mm 0">${L[l].empty}</div>`}${exp.lines && p === pages.length - 1 ? `<div class="x-lines">${"<div></div>".repeat(6)}</div>` : ""}</div><div class="x-foot"><span>${l === "fa" ? "سررسید دوزبانه" : "สมุดบันทึกสองภาษา"}</span><span>${esc(l === "fa" ? dateLabel(todayISO(), "fa", false) : dateLabel(todayISO(), "th", false))}</span></div></div>`;
+  const body = pages.map((rs, p) => `<div class="x-page x-${exp.layout}">${half("fa", rs, p)}${half("th", rs, p)}<div class="x-cut">${SCISSORS}</div></div>`).join("");
+  const html = `<!doctype html><html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>برنامه کارها · รายการงาน</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&family=Sarabun:wght@400;600;700&display=swap">
+<style>@page{size:A4 portrait;margin:0}html,body{margin:0;background:#8a93a8}body{padding:12mm 0;display:grid;gap:8mm}
+.x-bar{position:sticky;top:0;z-index:5;display:flex;gap:10px;justify-content:center;padding:10px;background:#22305c;color:#fff;font-family:Vazirmatn,Tahoma,sans-serif}
+.x-bar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:8px 18px;background:#de9227;color:#1c1406;cursor:pointer}
+@media print{html,body{background:#fff}body{padding:0;display:block}.x-bar{display:none}.x-page{margin:0}}
+${EXPORT_CSS}</style></head><body><div class="x-bar"><span>برای چاپ روی A4 · พิมพ์บนกระดาษ A4</span><button onclick="window.print()">چاپ · พิมพ์</button></div>${body}</body></html>`;
+  return { html, sel, pages:pages.length, count:sel.items.length };
+}
+function exportText(sel) {
+  const rows = exportRows(sel), out = [];
+  for (const l of ["fa","th"]) {
+    out.push(l === "fa" ? "════════ بخش فارسی ════════" : "════════ ส่วนภาษาไทย ════════", (l === "fa" ? "برنامه کارها: " : "รายการงาน: ") + rangeText(sel, l), "");
+    for (const r of rows) {
+      if (r.type === "day") { out.push("", "▌ " + (r.key === "overdue" ? L[l].overdue : r.key === "nodate" ? L[l].nodate : r.key === "notes" ? L[l].notes : dateLabel(r.key, l))); continue; }
+      const it = r.it, amt = amountText(it, l);
+      out.push(`${it.done ? "[x]" : "[ ]"} ${it.time ? num(it.time, l) + "  " : ""}${it.priority === "high" ? "! " : ""}${txAny(it, "title", l)} (${catName(it, l)}${amt ? " · " + amt : ""})`);
+      if (tx(it, "detail", l)) out.push("      " + tx(it, "detail", l));
+    }
+    out.push("", "");
+  }
+  return out.join("\n");
+}
+let prevTimer = null;
+function openExport() {
+  const box = $("#exportBox");
+  const opt = (name, val, label, type = "radio") => `<label class="opt"><input type="${type}" name="${name}" value="${val}" ${type === "radio" ? (exp[name] === val ? "checked" : "") : (exp[name] ? "checked" : "")}>${label}</label>`;
+  box.innerHTML = `<div class="dlg-h"><h2>خروجی چاپی · <span lang="th">พิมพ์</span></h2><button class="btn ghost" type="button" data-act="close-export" aria-label="بستن">✕</button></div>
+    <div class="fld"><span>چه بازه‌ای؟</span><div class="opts">${opt("range","today","امروز")}${opt("range","tomorrow","فردا")}${opt("range","week","۷ روز آینده")}${opt("range","open","همه کارهای باز")}${opt("range","custom","تاریخ دلخواه")}</div></div>
+    <div class="grid2" id="customRange" ${exp.range === "custom" ? "" : "hidden"}><label class="fld"><span>از</span><input type="date" id="x-from" value="${exp.from || todayISO()}"></label><label class="fld"><span>تا</span><input type="date" id="x-to" value="${exp.to || todayISO()}"></label></div>
+    <div class="fld"><span>چیدمان روی برگه A4</span><div class="opts">${opt("layout","tb","بالا فارسی · پایین تایلندی")}${opt("layout","lr","راست فارسی · چپ تایلندی")}</div></div>
+    <div class="opts">${opt("notes",1,"یادداشت‌ها هم باشه","checkbox")}${opt("done",1,"کارهای انجام‌شده هم باشه","checkbox")}${opt("lines",1,"چند خط خالی برای نوشتن","checkbox")}</div>
+    <div class="preview"><div class="prev-box" id="prevBox"><iframe id="prevFrame" title="پیش‌نمایش برگه"></iframe></div></div>
+    <div class="hint" id="prevInfo"></div>
+    <div class="dlg-f"><div class="grp"><button class="btn" type="button" data-act="copy-text">کپی متن</button><button class="btn" type="button" data-act="dl-txt">دانلود متن (TXT)</button></div>
+      <div class="grp"><button class="btn accent" type="button" data-act="dl-html">دانلود برگه چاپی (A4)</button></div></div>
+    <div class="hint">فایل دانلودشده رو باز کن و دکمه «چاپ» بالای صفحه رو بزن (یا Ctrl+P). اندازه کاغذ A4، حاشیه «هیچ».</div>`;
+  box.onchange = e => {
+    const el = e.target;
+    if (el.name === "range" || el.name === "layout") exp[el.name] = el.value;
+    else if (["notes","done","lines"].includes(el.name)) exp[el.name] = el.checked;
+    else if (el.id === "x-from") exp.from = el.value; else if (el.id === "x-to") exp.to = el.value;
+    $("#customRange").hidden = exp.range !== "custom";
+    lsSet("sarresid.export", exp); refreshPreview();
+  };
+  $("#exportDlg").showModal(); refreshPreview();
+}
+async function refreshPreview() {
+  clearTimeout(prevTimer);
+  prevTimer = setTimeout(async () => {
+    const r = await buildExport(); S.lastExport = r;
+    const fr = $("#prevFrame"), boxW = $(".preview").clientWidth - 28;
+    const sc = Math.min(1, boxW / 794);
+    fr.style.height = (1123 * r.pages + 40 * r.pages) + "px";
+    fr.style.transform = `scale(${sc})`;
+    $("#prevBox").style.width = 794 * sc + "px"; $("#prevBox").style.height = (1123 * r.pages + 40 * r.pages) * sc + "px";
+    fr.srcdoc = r.html;
+    $("#prevInfo").textContent = `${faNum(r.count)} مورد · ${faNum(r.pages)} برگه A4`;
+  }, 120);
+}
+async function saveFile(filename, data) {
+  if (!S.downloads) { toast("دانلود در این نما در دسترس نیست. از «کپی متن» استفاده کن."); return; }
+  try { await S.downloads.save({ filename, data }); toast("فایل ذخیره شد."); }
+  catch (e) { if (e && e.code === "declined") return; toast(e && e.code === "rate_limited" ? "یه پنجره ذخیره باز است؛ اول اونو ببند." : "ذخیره فایل انجام نشد."); }
+}
+const stamp = () => todayISO().replace(/-/g, "");
+
+/* ---------- reminders ---------- */
+let audioCtx = null;
+document.addEventListener("pointerdown", () => { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} } }, { once:true });
+function chime() {
+  if (!audioCtx) return;
+  try { [0, .22].forEach((d, k) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = k ? 1046 : 784; o.type = "sine"; g.gain.setValueAtTime(0.0001, audioCtx.currentTime + d); g.gain.exponentialRampToValueAtTime(0.25, audioCtx.currentTime + d + .02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d + .5); o.connect(g).connect(audioCtx.destination); o.start(audioCtx.currentTime + d); o.stop(audioCtx.currentTime + d + .55); }); } catch {}
+}
+function checkAlarms() {
+  const t = todayISO(), nowM = hmToMin(nowHM()), seen = lsGet(NKEY, {});
+  Object.keys(seen).forEach(k => { if (!k.startsWith(t)) delete seen[k]; });
+  for (const it of S.items.values()) {
+    if (it.done || it.date !== t || !it.time) continue;
+    const m = hmToMin(it.time), soon = t + it.id + ":soon", now = t + it.id + ":now";
+    if (nowM >= m && nowM - m <= 30 && !seen[now]) { seen[now] = 1; seen[soon] = 1; showAlarm(it, true); break; }
+    if (m - nowM <= 10 && m - nowM > 0 && !seen[soon]) { seen[soon] = 1; showAlarm(it, false); break; }
+  }
+  lsSet(NKEY, seen); renderStats();
+}
+function showAlarm(it, now) {
+  const host = $("#alarmHost"), mins = hmToMin(it.time) - hmToMin(nowHM());
+  host.innerHTML = `<div class="alarm" role="alert" dir="rtl">${ICON.bell}<div><b>${now ? "الان وقتشه" : `${faNum(mins)} دقیقه دیگه`} · ${faNum(it.time)}</b>${esc(txAny(it, "title", "fa"))}<div lang="th" style="font-size:13px">${esc(tx(it, "title", "th"))}</div></div>
+    <div class="grp" style="display:grid;gap:6px">${actionable(it) ? `<button type="button" data-act="alarm-done" data-id="${esc(it.id)}">انجام شد</button>` : ""}<button type="button" data-act="alarm-close">باشه</button></div></div>`;
+  chime();
+  const base = "سررسید دوزبانه"; let k = 0; clearInterval(showAlarm.t);
+  showAlarm.t = setInterval(() => { document.title = (k++ % 2) ? base : "⏰ " + (it.title_fa || it.title_th); if (k > 20) { clearInterval(showAlarm.t); document.title = base; } }, 1000);
+}
+
+/* ---------- toast ---------- */
+function toast(msg, action) {
+  const el = document.createElement("div"); el.className = "toast"; el.dir = "rtl";
+  el.innerHTML = `<span>${esc(msg)}</span>`;
+  if (action) { const b = document.createElement("button"); b.type = "button"; b.textContent = action.label; b.onclick = () => { action.run(); el.remove(); }; el.append(b); }
+  $("#toasts").append(el); setTimeout(() => el.remove(), action ? 7000 : 4200);
+}
+
+/* ---------- events ---------- */
+const EXAMPLES = [
+  "فردا ساعت ۱۰ جلسه آنلاین با آقای رضایی درباره لوگو، حتما نمونه‌ها رو آماده کنم",
+  "تا پنجشنبه فاکتور پروژه سایت رو بفرستم، ۱۲ میلیون تومان",
+  "พรุ่งนี้บ่ายสามโมงส่งไฟล์ออกแบบให้คุณนิดา",
+  "ایده: برای اینستاگرام یه سری پست قبل/بعد بسازم"
+];
+$("#examples").innerHTML = EXAMPLES.map((x, k) => `<button class="ex" type="button" data-ex="${k}" ${hasTh(x) ? 'lang="th"' : ""}>${esc(x.length > 34 ? x.slice(0, 34) + "…" : x)}</button>`).join("");
+$("#examples").addEventListener("click", e => { const b = e.target.closest("[data-ex]"); if (!b) return; const ta = $("#inbox"); ta.value = (ta.value ? ta.value.trim() + "\n" : "") + EXAMPLES[b.dataset.ex]; ta.focus(); });
+$("#composer").addEventListener("submit", e => { e.preventDefault(); organize($("#inbox").value); });
+$("#inbox").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); organize($("#inbox").value); } });
+$("#inbox").addEventListener("input", e => lsSet("sarresid.draft", e.target.value));
+$("#inbox").value = lsGet("sarresid.draft", "") || "";
+$("#stopBtn").addEventListener("click", () => ctl && ctl.abort());
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (!b) return; prefs.view = b.dataset.view; lsSet(PKEY, prefs); render(); });
+$("#langSeg").addEventListener("click", e => { const b = e.target.closest("[data-lang]"); if (!b) return; prefs.lang = b.dataset.lang; lsSet(PKEY, prefs); render(); });
+$("#q").addEventListener("input", () => render());
+$("#exportBtn").addEventListener("click", openExport);
+
+document.addEventListener("click", async e => {
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const act = a.dataset.act, host = a.closest("[data-id]"), id = a.dataset.id || (host && host.dataset.id);
+  if (act === "toggle" && id) { const it = S.items.get(id); if (it) { putItem({ ...it, done:!it.done }); if (!it.done) toast("آفرین! انجام شد ✓", { label:"برگردون", run:() => putItem({ ...S.items.get(id), done:false }) }); } }
+  else if (act === "edit" && id) openEdit(id);
+  else if (act === "undo-batch") undoBatch();
+  else if (act === "close-reply") { S.lastBatch = null; renderReply(); }
+  else if (act === "plan") planDay();
+  else if (act === "close-plan") { S.plan = null; renderPlan(); }
+  else if (act === "close-edit") $("#editDlg").close();
+  else if (act === "delete" && editing) {
+    const old = S.items.get(editing.id); $("#editDlg").close();
+    if (old) { removeItem(old.id); toast("حذف شد.", { label:"برگردون", run:() => putItem(old) }); }
+  }
+  else if (act === "translate" && editing) {
+    a.disabled = true; a.textContent = "در حال ترجمه…";
+    try { const cur = readEdit(), t = await translateItem(cur); for (const f of ["title_fa","title_th","detail_fa","detail_th","category_fa","category_th"]) { const el = $("#e-" + f); if (el && !el.value.trim() && t[f]) el.value = t[f]; } }
+    catch { toast("ترجمه انجام نشد."); }
+    finally { a.disabled = false; a.textContent = "ترجمه خودکار جاهای خالی"; }
+  }
+  else if (act === "close-export") $("#exportDlg").close();
+  else if (act === "dl-html") { const r = S.lastExport || await buildExport(); saveFile(`barnameh-${stamp()}.html`, r.html); }
+  else if (act === "dl-txt") saveFile(`barnameh-${stamp()}.txt`, exportText(exportSelection()));
+  else if (act === "copy-text") {
+    const txt = exportText(exportSelection());
+    try { await navigator.clipboard.writeText(txt); toast("متن کپی شد."); }
+    catch { const ta = document.createElement("textarea"); ta.value = txt; document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast("متن کپی شد."); } catch { toast("کپی نشد."); } ta.remove(); }
+  }
+  else if (act === "alarm-done") { const it = S.items.get(id); if (it) putItem({ ...it, done:true }); $("#alarmHost").innerHTML = ""; }
+  else if (act === "alarm-close") $("#alarmHost").innerHTML = "";
+});
+$("#editForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const it = readEdit();
+  if (!it.title_fa && !it.title_th) { toast("حداقل یک عنوان بنویس."); return; }
+  putItem(it); $("#editDlg").close();
+});
+
+/* ---------- boot ---------- */
+$("#dateFa").textContent = fmt("fa-IR-u-ca-persian", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(new Date());
+$("#dateTh").textContent = fmt("th-TH", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(new Date());
+loadLocal(); setSync(); render();
+if (window.claude && window.claude.use) {
+  claude.use("sample").then(s => { S.sample = s; setAI(s ? "on" : "off"); render(); }).catch(() => setAI("off"));
+  claude.use("downloads").then(d => { S.downloads = d; }).catch(() => {});
+  connectCloud().catch(() => {});
+} else setAI("off");
+setInterval(checkAlarms, 20000); setTimeout(checkAlarms, 1500);
+setInterval(() => { if (prefs.view === "today" && !document.querySelector("dialog[open]")) render(); }, 60000);
+})();
+</script>
