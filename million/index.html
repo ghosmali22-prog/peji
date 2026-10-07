@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MHC Hair Restoration</title>
+<meta name="description" content="Million Hair Transplant Centre — ปลูกผม FUE FUT ARTAS 9X ปลูกคิ้ว หนวด เครา โดย นพ.ธิติวัฒน์ วีรโรจน์รัชกุล">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600;700;800;900&display=swap">
+<style>
+  /* Palette follows the MHC logo: deep navy base, electric blue → cyan accent, a thin gold for awards. */
+  :root {
+    --bg: #050a1f;
+    --bg-2: #0a1233;
+    --navy: #13205c;
+    --ink: #eef3ff;
+    --muted: #94a3c8;
+    --line: rgba(160, 190, 255, .14);
+    --blue: #2f6bff;
+    --cyan: #4fd2ff;
+    --gold: #e8c66a;
+    --glass: rgba(18, 30, 80, .42);
+    --grad: linear-gradient(100deg, #2f6bff 0%, #4fd2ff 100%);
+    --font: "Prompt", system-ui, sans-serif;
+    --ease: cubic-bezier(.16, 1, .3, 1);
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  body.loading { overflow: hidden; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--cyan); color: var(--bg); }
+
+  /* Film grain + ambient glow sit behind everything */
+  .grain {
+    position: fixed; inset: -50%; z-index: 100; pointer-events: none; opacity: .05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1.2s steps(6) infinite;
+  }
+  @keyframes grain {
+    0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); }
+    60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); }
+  }
+  .orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; opacity: .5; }
+  .orb.a { width: 46vmax; height: 46vmax; background: #1b3cff; top: -18vmax; right: -14vmax; opacity: .28; }
+  .orb.b { width: 38vmax; height: 38vmax; background: #00b3ff; bottom: -20vmax; left: -16vmax; opacity: .16; }
+
+  .wrap { width: min(1240px, 100% - 32px); margin-inline: auto; position: relative; }
+  section { position: relative; z-index: 2; }
+
+  /* ───── Preloader ───── */
+  .loader {
+    position: fixed; inset: 0; z-index: 200; background: var(--bg);
+    display: grid; place-items: center;
+  }
+  .loader svg { width: min(320px, 70vw); overflow: visible; }
+  .loader .stroke { fill: none; stroke: url(#lg); stroke-width: 2.2; stroke-dasharray: 900; stroke-dashoffset: 900; }
+  .loader .count { position: absolute; bottom: 8vh; left: 50%; transform: translateX(-50%); font-weight: 200; letter-spacing: .3em; color: var(--muted); font-size: 13px; }
+  .curtain { position: fixed; inset: 0; z-index: 199; background: var(--grad); transform: scaleY(0); transform-origin: bottom; pointer-events: none; }
+
+  /* ───── Cursor ───── */
+  .cursor, .cursor-dot { position: fixed; top: 0; left: 0; z-index: 300; pointer-events: none; border-radius: 50%; transform: translate(-50%, -50%); }
+  .cursor { width: 38px; height: 38px; border: 1px solid rgba(79, 210, 255, .6); transition: width .35s var(--ease), height .35s var(--ease), background .35s; mix-blend-mode: screen; }
+  .cursor.hover { width: 76px; height: 76px; background: rgba(79, 210, 255, .12); }
+  .cursor-dot { width: 5px; height: 5px; background: var(--cyan); }
+  @media (hover: none) { .cursor, .cursor-dot { display: none; } }
+
+  /* ───── Nav ───── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding: 18px 0; transition: padding .5s var(--ease), background .5s, backdrop-filter .5s;
+  }
+  .nav.scrolled { padding: 10px 0; background: rgba(5, 10, 31, .65); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border-bottom: 1px solid var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo svg { height: 34px; width: auto; }
+  .logo small { font-size: 9px; letter-spacing: .14em; line-height: 1.3; color: var(--muted); text-transform: uppercase; }
+  .nav-links { display: flex; gap: 30px; font-size: 14px; font-weight: 400; }
+  .nav-links a { position: relative; color: #c9d4f2; transition: color .3s; }
+  .nav-links a::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 1px; width: 100%; background: var(--cyan); transform: scaleX(0); transform-origin: right; transition: transform .5s var(--ease); }
+  .nav-links a:hover { color: #fff; }
+  .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+  .burger { display: none; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; background: var(--glass); color: var(--ink); cursor: pointer; place-items: center; }
+  .burger span { display: block; width: 18px; height: 1.5px; background: currentColor; margin: 4px auto; transition: transform .4s var(--ease); }
+  .menu-open .burger span:first-child { transform: translateY(2.75px) rotate(45deg); }
+  .menu-open .burger span:last-child { transform: translateY(-2.75px) rotate(-45deg); }
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 45; background: rgba(5, 10, 31, .96); backdrop-filter: blur(20px);
+    display: flex; flex-direction: column; justify-content: center; padding: 0 28px; gap: 6px;
+    clip-path: circle(0% at calc(100% - 38px) 38px); transition: clip-path .8s var(--ease);
+  }
+  .menu-open .mobile-menu { clip-path: circle(150% at calc(100% - 38px) 38px); }
+  .mobile-menu a { font-size: clamp(28px, 8vw, 44px); font-weight: 600; line-height: 1.5; }
+  .mobile-menu a span { color: var(--cyan); font-size: 13px; font-weight: 300; margin-inline-end: 12px; vertical-align: middle; }
+
+  /* ───── Buttons ───── */
+  .btn {
+    --b: var(--grad);
+    position: relative; display: inline-flex; align-items: center; gap: 12px;
+    padding: 15px 28px; border-radius: 100px; font-weight: 500; font-size: 15px;
+    background: var(--b); color: #fff; overflow: hidden; isolation: isolate; cursor: pointer; border: 0; font-family: inherit;
+    box-shadow: 0 10px 40px -10px rgba(47, 107, 255, .7);
+    transition: box-shadow .4s;
+  }
+  .btn::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #fff; transform: translateY(101%); border-radius: inherit; transition: transform .6s var(--ease); }
+  .btn:hover::before { transform: translateY(0); }
+  .btn:hover { color: var(--navy); }
+  .btn .ic { width: 20px; height: 20px; flex: none; }
+  .btn.line { --b: linear-gradient(100deg, #06c755, #3ee07f); box-shadow: 0 10px 40px -10px rgba(6, 199, 85, .6); }
+  .btn.ghost { background: transparent; border: 1px solid rgba(255, 255, 255, .25); box-shadow: none; }
+  .btn.sm { padding: 10px 20px; font-size: 13px; }
+
+  .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--cyan); font-weight: 500; }
+  .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; }
+  .grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .h2 { font-size: clamp(34px, 5.6vw, 76px); line-height: 1.08; font-weight: 700; margin: 18px 0 22px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); font-size: clamp(15px, 1.3vw, 18px); max-width: 60ch; }
+
+  /* Split-text reveal: words ride up out of a clipping mask */
+  .split .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+  .split .w > span { display: inline-block; will-change: transform; }
+
+  /* ───── Hero ───── */
+  .hero { min-height: 100svh; display: flex; align-items: center; padding: 120px 0 80px; overflow: hidden; }
+  #hair { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 40%, transparent 0%, rgba(5, 10, 31, .55) 70%), linear-gradient(transparent 70%, var(--bg)); pointer-events: none; z-index: 1; }
+  .hero .wrap { z-index: 2; display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: clamp(48px, 6.8vw, 120px); line-height: .92; font-weight: 800; margin: 22px 0 26px; letter-spacing: -.035em; }
+  .hero h1 .row { display: block; white-space: nowrap; }
+  .hero h1 .ch { display: inline-block; will-change: transform; }
+  .hero h1 .grad-text .ch { background: var(--grad);  -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero h1 .outline { color: transparent; -webkit-text-stroke: 1.5px rgba(160, 200, 255, .75); }
+  .hero .th { font-size: clamp(20px, 2.4vw, 30px); font-weight: 500; margin: 0 0 12px; }
+  .hero .lead { margin: 0 0 34px; color: #b8c4e4; text-shadow: 0 1px 2px var(--bg), 0 0 18px var(--bg), 0 0 30px var(--bg); }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; }
+
+  .hero-visual { position: relative; aspect-ratio: 4 / 5; }
+  .hero-card {
+    position: absolute; inset: 0; border-radius: 28px; overflow: hidden;
+    background: linear-gradient(160deg, #f4f6fb, #c9d4ea);
+    box-shadow: 0 40px 120px -30px rgba(47, 107, 255, .55), inset 0 0 0 1px rgba(255, 255, 255, .25);
+    transform-style: preserve-3d;
+  }
+  .hero-card img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 100%; transform: scale(1.12); }
+  .hero-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(5, 10, 31, .65)); }
+  .scan { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); box-shadow: 0 0 22px 4px rgba(79, 210, 255, .55); top: 0; z-index: 3; animation: scan 4.5s ease-in-out infinite; }
+  @keyframes scan { 0%, 100% { top: 8%; opacity: 0; } 15% { opacity: 1; } 50% { top: 88%; opacity: 1; } 65% { opacity: 0; } }
+  .chip {
+    position: absolute; z-index: 4; display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; border-radius: 16px; font-size: 13px; line-height: 1.3; font-weight: 500;
+    background: rgba(10, 18, 51, .62); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(160, 200, 255, .22); box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .6);
+  }
+  .chip b { display: block; font-size: 18px; font-weight: 700; }
+  .chip small { color: var(--muted); font-weight: 300; font-size: 11px; }
+  .chip .dot { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--grad); flex: none; }
+  .chip .dot.gold { background: linear-gradient(135deg, #f6dd8f, #b8902f); }
+  .chip.c1 { top: 7%; left: -12%; }
+  .chip.c2 { top: 44%; right: -10%; }
+  .chip.c3 { bottom: 9%; left: -8%; }
+  .scroll-hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 10px; letter-spacing: .3em; color: var(--muted); }
+  .scroll-hint i { width: 1px; height: 46px; background: linear-gradient(var(--cyan), transparent); animation: drip 2s var(--ease) infinite; transform-origin: top; }
+  @keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ───── Marquee ───── */
+  .marquee { border-block: 1px solid var(--line); padding: 22px 0; overflow: hidden; background: rgba(10, 18, 51, .4); z-index: 3; }
+  .marquee-track { display: flex; gap: 48px; width: max-content; animation: mq 32s linear infinite; }
+  .marquee span { font-size: clamp(22px, 3.2vw, 40px); font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 48px; }
+  .marquee span::after { content: "✦"; color: var(--cyan); font-size: .55em; }
+  .marquee span:nth-child(even) { color: transparent; -webkit-text-stroke: 1px rgba(160, 200, 255, .55); }
+  @keyframes mq { to { transform: translateX(-50%); } }
+
+  /* ───── About ───── */
+  .about { padding: clamp(90px, 14vw, 180px) 0; }
+  .about .grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
+  .reveal-img { position: relative; border-radius: 26px; overflow: hidden; aspect-ratio: 5 / 6; }
+  .reveal-img img { width: 100%; height: 125%; object-fit: cover; }
+  .reveal-img .tag { position: absolute; left: 18px; bottom: 18px; z-index: 2; }
+  .quote-ref { font-size: 12px; color: #6f7fa8; word-break: break-all; margin-top: 10px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; margin-top: 46px; }
+  .stat { background: var(--bg); padding: 26px 18px; }
+  .stat b { display: block; font-size: clamp(30px, 3.6vw, 48px); font-weight: 700; line-height: 1; margin-bottom: 10px; }
+  .stat > span { font-size: 13px; color: var(--muted); line-height: 1.5; display: block; }
+
+  /* ───── Techniques (horizontal pin on desktop) ───── */
+  .tech { padding: clamp(80px, 10vw, 120px) 0 0; }
+  .tech-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; flex-wrap: wrap; }
+  .tech-pin { overflow: hidden; }
+  .tech-track { display: flex; gap: 28px; padding: 60px max(16px, calc((100vw - 1240px) / 2)) clamp(80px, 10vw, 140px); width: max-content; }
+  .tcard {
+    position: relative; width: min(560px, 82vw); min-height: 560px; padding: 44px 40px; border-radius: 30px; flex: none;
+    background: linear-gradient(160deg, rgba(30, 50, 130, .5), rgba(10, 18, 51, .55));
+    border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column;
+  }
+  .tcard::before { content: ""; position: absolute; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle, rgba(79, 210, 255, .35), transparent 65%); top: -140px; right: -120px; transition: transform .8s var(--ease); }
+  .tcard:hover::before { transform: scale(1.3) translate(-30px, 30px); }
+  .tcard .num { font-size: 13px; letter-spacing: .3em; color: var(--muted); }
+  .tcard .icon { width: 108px; height: 108px; margin: 26px 0 18px; }
+  .tcard h3 { font-size: clamp(64px, 8vw, 104px); line-height: .9; margin: 0; font-weight: 800; letter-spacing: -.03em; }
+  .tcard .sub { font-size: 20px; font-weight: 500; margin: 14px 0 2px; }
+  .tcard .en { color: var(--cyan); font-size: 15px; margin-bottom: 14px; }
+  .tcard p { color: var(--muted); margin: 0 0 26px; font-size: 15px; }
+  .tcard .btn { margin-top: auto; align-self: flex-start; }
+  .tcard.artas { background: linear-gradient(160deg, rgba(47, 107, 255, .55), rgba(10, 18, 51, .6)); }
+  .icon .d { fill: var(--cyan); }
+  .icon .s { fill: none; stroke: var(--cyan); stroke-width: 5; stroke-linecap: round; }
+
+  /* ───── Regenerative / follicle ───── */
+  .regen { padding: clamp(90px, 12vw, 160px) 0; overflow: hidden; }
+  .regen .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .follicle { width: 100%; height: auto; overflow: visible; }
+  .follicle .hairp { fill: none; stroke: url(#hg); stroke-width: 5; stroke-linecap: round; }
+  .glow-ring { position: absolute; inset: 10%; border-radius: 50%; border: 1px dashed rgba(79, 210, 255, .25); animation: spin 40s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ───── Results ───── */
+  .results { padding: clamp(80px, 10vw, 130px) 0; background: linear-gradient(180deg, transparent, rgba(19, 32, 92, .35) 30%, rgba(19, 32, 92, .35) 70%, transparent); }
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 54px; }
+  .ba { position: relative; display: grid; grid-template-columns: 1fr 1fr; aspect-ratio: 4 / 5; border-radius: 26px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); }
+  .ba .half { position: relative; overflow: hidden; }
+  .ba img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transition: transform 1.4s var(--ease); }
+  .ba:hover img { transform: scale(1.05); }
+  .ba .bar { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; transform: translateX(-50%); background: linear-gradient(var(--cyan), #fff, var(--cyan)); box-shadow: 0 0 24px rgba(79, 210, 255, .9); z-index: 2; }
+  .ba .lbl { position: absolute; bottom: 16px; z-index: 2; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; background: rgba(5, 10, 31, .6); backdrop-filter: blur(8px); letter-spacing: .12em; }
+  .ba .lbl.l { left: 16px; } .ba .lbl.r { right: 16px; background: var(--grad); }
+  .mini-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 26px; margin-top: 26px; }
+  .mini { border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); }
+  .mini .ph { overflow: hidden; aspect-ratio: 16 / 10; }
+  .mini img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+  .mini:hover img { transform: scale(1.06); }
+  .mini .cap { padding: 18px 22px; }
+  .mini .cap b { display: block; font-weight: 600; }
+  .mini .cap span { color: var(--muted); font-size: 14px; }
+  .disclaimer { text-align: center; color: #7183ad; font-size: 14px; margin-top: 38px; }
+
+  /* ───── Brow / beard band ───── */
+  .face { padding: clamp(80px, 10vw, 130px) 0; text-align: center; }
+  .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 34px; }
+  .pill { padding: 16px 30px; border-radius: 100px; border: 1px solid var(--line); background: var(--glass); font-size: clamp(16px, 1.6vw, 20px); font-weight: 500; transition: background .4s, border-color .4s, transform .4s var(--ease); }
+  .pill:hover { background: rgba(47, 107, 255, .3); border-color: var(--cyan); transform: translateY(-4px); }
+
+  /* ───── Doctor ───── */
+  .doctor { padding: clamp(80px, 10vw, 140px) 0; }
+  .doctor .grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(40px, 6vw, 90px); align-items: start; }
+  .doc-photo { position: sticky; top: 110px; }
+  .doc-photo .frame { border-radius: 30px; overflow: hidden; aspect-ratio: 4 / 5; position: relative; }
+  .doc-photo .frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .doc-photo .frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15); }
+  .doc-name { font-size: clamp(30px, 3.6vw, 48px); font-weight: 700; line-height: 1.2; margin: 14px 0 4px; }
+  .creds { list-style: none; padding: 0; margin: 34px 0 0; position: relative; }
+  .creds::before { content: ""; position: absolute; left: 19px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+  .creds .prog { position: absolute; left: 19px; top: 10px; width: 1px; height: calc(100% - 20px); background: var(--grad); transform-origin: top; transform: scaleY(0); }
+  .creds li { position: relative; padding: 0 0 26px 62px; }
+  .creds li::before { content: ""; position: absolute; left: 12px; top: 8px; width: 15px; height: 15px; border-radius: 50%; background: var(--bg); border: 2px solid var(--cyan); box-shadow: 0 0 0 5px rgba(79, 210, 255, .12); }
+  .creds b { display: block; font-size: 18px; font-weight: 600; }
+  .creds span { color: var(--muted); font-size: 14px; }
+  .cert { margin-top: 30px; border-radius: 22px; overflow: hidden; background: #fff; padding: 10px; transform-style: preserve-3d; will-change: transform; box-shadow: 0 40px 90px -40px rgba(232, 198, 106, .5); }
+  .ebhf { margin-top: 34px; padding: 26px 28px; border-radius: 22px; border: 1px solid var(--line); background: var(--glass); }
+  .ebhf ul { margin: 12px 0 0; padding-inline-start: 20px; color: var(--muted); font-size: 15px; }
+
+  /* ───── Hospital ───── */
+  .hospital { padding: clamp(60px, 8vw, 100px) 0; }
+  .hosp-card {
+    position: relative; border-radius: 34px; overflow: hidden; padding: clamp(36px, 6vw, 80px);
+    background: linear-gradient(120deg, #13205c 0%, #1c3fb8 60%, #2f6bff 100%);
+    display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: center;
+  }
+  .hosp-card::before { content: ""; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 39.5h40M39.5 0v40' stroke='%23ffffff' stroke-opacity='.06'/%3E%3C/svg%3E"); }
+  .hosp-card > * { position: relative; }
+  .hosp-card h2 { font-size: clamp(36px, 5.4vw, 72px); line-height: 1.1; margin: 14px 0 16px; font-weight: 800; }
+  .hosp-card .eyebrow { color: #bfe9ff; }
+  .opd { background: rgba(5, 10, 31, .38); border: 1px solid rgba(255, 255, 255, .18); border-radius: 24px; padding: 28px; backdrop-filter: blur(10px); }
+  .opd .big { font-size: clamp(40px, 5vw, 64px); font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+  .opd hr { border: 0; border-top: 1px solid rgba(255, 255, 255, .15); margin: 20px 0; }
+  .hosp-doc { position: absolute; right: 0; bottom: 0; height: 100%; opacity: .14; mix-blend-mode: luminosity; pointer-events: none; }
+
+  /* ───── Contact ───── */
+  .contact { padding: clamp(100px, 14vw, 190px) 0 60px; text-align: center; overflow: hidden; }
+  .contact .giant { font-size: clamp(56px, 13vw, 200px); font-weight: 900; line-height: .9; letter-spacing: -.04em; margin: 20px 0 40px; }
+  .cgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 70px; text-align: start; }
+  .cbox { padding: 26px; border-radius: 22px; border: 1px solid var(--line); background: var(--glass); transition: border-color .4s, transform .5s var(--ease); display: block; }
+  .cbox:hover { border-color: var(--cyan); transform: translateY(-6px); }
+  .cbox small { color: var(--cyan); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .cbox b { display: block; font-weight: 500; font-size: 17px; margin-top: 8px; line-height: 1.5; word-break: break-word; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: #6f7fa8; font-size: 13px; position: relative; z-index: 2; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  .fab { position: fixed; right: 20px; bottom: 20px; z-index: 40; width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; background: #06c755; box-shadow: 0 14px 34px -8px rgba(6, 199, 85, .7); }
+  .fab::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #06c755; animation: ping 2.2s var(--ease) infinite; }
+  @keyframes ping { from { transform: scale(1); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
+
+  /* ───── Responsive ───── */
+  @media (max-width: 980px) {
+    .nav-links, .nav .btn { display: none; }
+    .burger { display: grid; }
+    .hero .wrap, .about .grid, .regen .grid, .doctor .grid, .hosp-card { grid-template-columns: 1fr; }
+    .hero-visual { max-width: 460px; width: 100%; margin: 20px auto 0; }
+    .chip.c1 { left: -4px; } .chip.c2 { right: -4px; } .chip.c3 { left: 8px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .tech-pin { overflow: visible; }
+    .tech-track { flex-direction: column; width: auto; padding-inline: 16px; }
+    .tcard { width: 100%; min-height: 0; padding: 32px 26px; }
+    .ba-grid, .mini-grid { grid-template-columns: 1fr; }
+    .doc-photo { position: relative; top: 0; max-width: 440px; }
+    .cgrid { grid-template-columns: 1fr 1fr; }
+    .hosp-doc { display: none; }
+  }
+  @media (max-width: 560px) {
+    .cgrid { grid-template-columns: 1fr; }
+    .chip { padding: 8px 12px; font-size: 11px; }
+    .chip b { font-size: 15px; }
+    .chip .dot { width: 30px; height: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body class="loading">
+
+<div class="grain" aria-hidden="true"></div>
+<div class="orb a" aria-hidden="true"></div>
+<div class="orb b" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+
+<!-- Preloader: the MHC monogram draws itself, then a gradient curtain wipes it away -->
+<div class="loader" aria-hidden="true">
+  <svg viewBox="0 0 320 120">
+    <defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#2f6bff"/><stop offset="1" stop-color="#4fd2ff"/></linearGradient></defs>
+    <path class="stroke" d="M10 105 L10 20 L55 85 L100 20 L100 105 M28 105 L28 45 M135 20 L135 105 M135 62 L205 62 M205 20 L205 105 M310 32 C 290 12, 238 14, 232 62 C 238 110, 290 112, 310 92"/>
+  </svg>
+  <div class="count"><span id="pct">0</span>%</div>
+</div>
+<div class="curtain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#top" class="logo" aria-label="MHC Million Hair Transplant Centre">
+      <svg viewBox="0 0 150 56" aria-hidden="true">
+        <defs><linearGradient id="lg2" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#a8d8ff"/></linearGradient></defs>
+        <text x="0" y="46" font-family="Georgia, 'Times New Roman', serif" font-size="54" fill="url(#lg2)" letter-spacing="-3">MHC</text>
+        <path d="M30 6 C 44 14, 52 30, 50 50" stroke="#4fd2ff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <small>Million Hair<br>Transplant Centre</small>
+    </a>
+    <nav class="nav-links">
+      <a href="#about">เกี่ยวกับเรา</a>
+      <a href="#tech">เทคนิค</a>
+      <a href="#results">รีวิว</a>
+      <a href="#doctor">ผู้เชี่ยวชาญ</a>
+      <a href="#contact">ติดต่อ</a>
+    </nav>
+    <a href="https://line.me/R/ti/p/~millionhairclinic" target="_blank" rel="noopener" class="btn line sm magnetic">ปรึกษาออนไลน์</a>
+    <button class="burger" id="burger" aria-label="เมนู"><span></span><span></span></button>
+  </div>
+</header>
+<nav class="mobile-menu" id="mmenu">
+  <a href="#about"><span>01</span>เกี่ยวกับเรา</a>
+  <a href="#tech"><span>02</span>เทคนิค</a>
+  <a href="#results"><span>03</span>รีวิว</a>
+  <a href="#doctor"><span>04</span>ผู้เชี่ยวชาญ</a>
+  <a href="#contact"><span>05</span>ติดต่อ</a>
+</nav>
+
+<main id="top">
+
+  <!-- ───── HERO ───── -->
+  <section class="hero">
+    <canvas id="hair" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div>
+        <span class="eyebrow h-fade">Million Hair Transplant Centre</span>
+        <h1 aria-label="Hair Restoration">
+          <span class="row" data-chars>Hair</span>
+          <span class="row grad-text" data-chars>Restoration</span>
+        </h1>
+        <p class="th h-fade">ปลูกผม เปลี่ยนชีวิตกับ MHC</p>
+        <p class="lead h-fade">เราเป็นศูนย์ปลูกผมและดูแลเส้นผม ภาวะผมร่วง ผมบาง ศีรษะล้าน แบบครบวงจรโดยใช้เทคโนโลยีที่ล้ำสมัย ซึ่งนอกจากการทำปลูกผมด้วยเทคนิค FUE FUT แล้ว เรายังนำ Regenerative technology ซึ่งเป็นเทคโนโลยีการแพทย์ชั้นสูงมาใช้เพื่อให้ผู้รับบริการได้รับผลลัพธ์ที่ดียิ่งขึ้น</p>
+        <div class="cta-row h-fade">
+          <a href="https://line.me/R/ti/p/~millionhairclinic" target="_blank" rel="noopener" class="btn line magnetic">
+            <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-6C21.3 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8z"/></svg>
+            ปรึกษาออนไลน์
+          </a>
+          <a href="#results" class="btn ghost magnetic">ดูรีวิวปลูกผม →</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card" id="heroCard">
+          <img src="assets/hero-artas.jpg" alt="นพ.ธิติวัฒน์ กับหุ่นยนต์ปลูกผม ARTAS">
+          <div class="scan"></div>
+        </div>
+        <div class="chip c1 float" data-depth="30"><div class="dot gold"><svg width="18" height="18" viewBox="0 0 24 24" fill="#13205c"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.6 5.7 21l1.5-7L2 9.3l7-.8z"/></svg></div><div><b>1 ใน 25</b><small>ศัลยแพทย์ปลูกผมที่ดีที่สุดในโลก</small></div></div>
+        <div class="chip c2 float" data-depth="-24"><div class="dot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="7" width="16" height="11" rx="3"/><path d="M9 7V4h6v3M8 12h.01M16 12h.01"/></svg></div><div><b>ARTAS 9X</b><small>หุ่นยนต์ปลูกผม</small></div></div>
+        <div class="chip c3 float" data-depth="18"><div class="dot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12l4 4 10-10"/></svg></div><div><b>FISHRS · ABHRS</b><small>มาตรฐานระดับสากล</small></div></div>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">SCROLL<i></i></div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>FUE</span><span>FUT</span><span>ARTAS 9X</span><span>Regenerative</span><span>ปลูกคิ้ว</span><span>ปลูกหนวด</span><span>ปลูกเครา</span><span>ปลูกขนตา</span>
+      <span>FUE</span><span>FUT</span><span>ARTAS 9X</span><span>Regenerative</span><span>ปลูกคิ้ว</span><span>ปลูกหนวด</span><span>ปลูกเครา</span><span>ปลูกขนตา</span>
+    </div>
+  </div>
+
+  <!-- ───── ABOUT ───── -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="grid">
+        <div class="reveal-img" data-reveal>
+          <img src="assets/exam.jpg" alt="การตรวจวินิจฉัยหนังศีรษะ" data-parallax>
+          <div class="chip tag"><div class="dot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div><div><b>ครบวงจร</b><small>ตรวจ วินิจฉัย และรักษา</small></div></div>
+        </div>
+        <div>
+          <span class="eyebrow">About · เกี่ยวกับ MHC</span>
+          <h2 class="h2 split">คลินิกปลูกผมถาวร <span class="grad-text">ครบวงจร</span></h2>
+          <p class="lead fade-up">ศูนย์ปลูกผม มิลเลียนแฮร์ MILLION HAIR TRANSPLANT CENTER เราคือคลินิกปลูกผมถาวร ครบวงจร ดำเนินงานโดยทีมแพทย์พยาบาล และบุคลากรที่มีประสบการณ์และความเชี่ยวชาญด้านนี้โดยเฉพาะ… การันตีโดย นพ.ธิติวัฒน์ วีรโรจน์รัชกุล 1 ใน 25 อันดับแรกศัลยแพทย์ด้านปลูกเส้นผมที่ดีที่สุดของโลก</p>
+          <p class="quote-ref fade-up">อ้างอิงจาก apetogentleman.com/worlds-best-hair-transplant-doctors</p>
+          <div class="stats">
+            <div class="stat"><b><span data-count="25">0</span></b><span>อันดับแรกศัลยแพทย์ปลูกผมของโลก</span></div>
+            <div class="stat"><b><span data-count="17">0</span>+</b><span>ปีประสบการณ์ของทีมงาน</span></div>
+            <div class="stat"><b><span data-count="3">0</span></b><span>เทคนิคหลัก FUT · FUE · ARTAS</span></div>
+            <div class="stat"><b><span data-count="4">0</span></b><span>ปลูกคิ้ว · ขนตา · หนวด · เครา</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── TECHNIQUES ───── -->
+  <section class="tech" id="tech">
+    <div class="wrap tech-head">
+      <div>
+        <span class="eyebrow">Techniques</span>
+        <h2 class="h2 split">เทคนิคการทำ<br>ศัลยกรรม<span class="grad-text">ปลูกผม</span></h2>
+      </div>
+      <p class="lead fade-up" style="max-width:44ch">คลินิกปลูกผม Million Hair Transplant Center ไม่ได้มีแค่ปลูกผมด้วย Artas 9X แต่ยังมีอีกหลายเทคนิคปลูกผม ที่ได้มาตรฐานระดับสากล</p>
+    </div>
+    <div class="tech-pin" id="techPin">
+      <div class="tech-track" id="techTrack">
+        <article class="tcard">
+          <span class="num">01 / 03</span>
+          <svg class="icon" viewBox="0 0 100 100" aria-hidden="true">
+            <rect x="12" y="12" width="76" height="76" rx="14" class="s draw"/>
+            <path class="s draw" d="M34 42 a10 10 0 0 1 10 -10 M60 42 a10 10 0 0 1 10 -10 M34 68 a10 10 0 0 1 10 -10 M60 68 a10 10 0 0 1 10 -10"/>
+            <path class="s" d="M30 8v8M70 8v8M30 84v8M70 84v8M8 30h8M8 70h8M84 30h8M84 70h8"/>
+          </svg>
+          <h3 class="grad-text">FUT</h3>
+          <div class="sub">ปลูกผม แบบผ่าตัดเย็บแผล</div>
+          <div class="en">Follicular Unit Transplantation</div>
+          <p>เหมาะสำหรับผู้ที่ต้องการกราฟจำนวนมากในการทำครั้งเดียว โดยนำแถบหนังศีรษะบริเวณท้ายทอยมาแยกเป็นกราฟรากผมภายใต้กล้องขยาย แล้วปลูกลงในบริเวณที่ต้องการ</p>
+          <a href="#results" class="btn sm magnetic">รีวิว FUT</a>
+        </article>
+        <article class="tcard">
+          <span class="num">02 / 03</span>
+          <svg class="icon" viewBox="0 0 100 100" aria-hidden="true">
+            <g class="dots"><circle class="d" cx="22" cy="18" r="6"/><circle class="d" cx="46" cy="18" r="6"/><circle class="d" cx="70" cy="18" r="6"/><circle class="d" cx="92" cy="18" r="6"/><circle class="d" cx="46" cy="42" r="6"/><circle class="d" cx="92" cy="42" r="6"/><circle class="d" cx="22" cy="64" r="6"/><circle class="d" cx="70" cy="64" r="6"/><circle class="d" cx="92" cy="64" r="6"/><circle class="d" cx="22" cy="88" r="6"/><circle class="d" cx="46" cy="88" r="6"/><circle class="d" cx="92" cy="88" r="6"/></g>
+            <path class="s draw" d="M18 44 a12 12 0 0 1 12 -12 M66 44 a12 12 0 0 1 12 -12 M42 68 a12 12 0 0 1 12 -12 M66 90 a12 12 0 0 1 12 -12"/>
+          </svg>
+          <h3 class="grad-text">FUE</h3>
+          <div class="sub">ปลูกผม แบบเจาะรากผม</div>
+          <div class="en">Follicular Unit Extraction</div>
+          <p>เทคนิคปลูกผมที่ไม่ต้องผ่าตัดชิ้นเนื้อขนาดใหญ่ โดยใช้เครื่องมือที่มีลักษณะคล้ายเข็มฉีดยาปลายตัด เจาะเก็บรากผม ทำให้แผลเป็นที่เกิดขึ้นมีลักษณะเป็นจุดเล็กๆ</p>
+          <a href="#results" class="btn sm magnetic">รีวิว FUE</a>
+        </article>
+        <article class="tcard artas">
+          <span class="num">03 / 03</span>
+          <svg class="icon" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="s draw" d="M30 38 h40 a22 22 0 0 1 0 0 c14 0 22 10 18 22 c-6 16-30 28-48 26 c-14-2-24-14-22-28 c1-12 6-20 12-20z"/>
+            <path class="s draw" d="M42 38v-12h22v12"/>
+            <path class="s draw" d="M20 54h-6v16h6"/>
+            <circle class="d" cx="40" cy="56" r="4"/>
+            <path class="s draw" d="M54 74l14-10"/>
+          </svg>
+          <h3 class="grad-text">ARTAS</h3>
+          <div class="sub">หุ่นยนต์ปลูกผมตัวแรกของโลก</div>
+          <div class="en">Robotic Hair Restoration · ARTAS 9X</div>
+          <p>หุ่นยนต์ทำหน้าที่เจาะเก็บรากผมได้ด้วยตัวเอง โดยหุ่นยนต์จะสามารถตรวจจับตำแหน่งรากผม รวมถึงทิศทางและองศาของรากผม จากนั้นจะทำการเจาะเก็บรากผมได้ด้วยตัวเอง โดยมีแพทย์ผู้เชี่ยวชาญด้านศัลยกรรมปลูกผมเป็นผู้ควบคุมหุ่นยนต์อีกที</p>
+          <a href="#results" class="btn sm magnetic">รีวิว ARTAS</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── REGENERATIVE ───── -->
+  <section class="regen">
+    <div class="wrap grid">
+      <div>
+        <span class="eyebrow">Regenerative Technology</span>
+        <h2 class="h2 split">Regenerative <span class="grad-text">Hair Restoration</span></h2>
+        <p class="lead fade-up">ทางเลือกในการดูแลเสริมสร้างเส้นผมสำหรับผู้มีปัญหาผมบาง นอกเหนือจากศัลยกรรมปลูกผม ด้วยเทคโนโลยีการแพทย์ชั้นสูงที่ช่วยกระตุ้นรากผมให้แข็งแรง</p>
+        <div class="cta-row fade-up" style="margin-top:30px"><a href="#contact" class="btn magnetic">อ่านเพิ่มเติม</a></div>
+      </div>
+      <div style="position:relative">
+        <div class="glow-ring" aria-hidden="true"></div>
+        <!-- Skin cross-section: hairs grow out of the follicles as you scroll -->
+        <svg class="follicle" id="follicle" viewBox="0 0 500 460" aria-hidden="true">
+          <defs>
+            <linearGradient id="hg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2f6bff"/><stop offset="1" stop-color="#4fd2ff"/></linearGradient>
+            <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f3a9e" stop-opacity=".85"/><stop offset="1" stop-color="#0b1440" stop-opacity=".6"/></linearGradient>
+            <radialGradient id="bulb"><stop offset="0" stop-color="#9fe8ff"/><stop offset="1" stop-color="#2f6bff"/></radialGradient>
+          </defs>
+          <path d="M20 250 Q 250 225 480 250 L480 430 Q250 450 20 430 Z" fill="url(#skin)" stroke="rgba(160,200,255,.35)"/>
+          <path d="M20 290 Q 250 268 480 290" stroke="rgba(160,200,255,.25)" fill="none" stroke-dasharray="4 6"/>
+          <path d="M20 360 Q 250 342 480 360" stroke="rgba(160,200,255,.18)" fill="none" stroke-dasharray="4 6"/>
+          <g id="roots"></g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── RESULTS ───── -->
+  <section class="results" id="results">
+    <div class="wrap">
+      <span class="eyebrow">Before · After</span>
+      <h2 class="h2 split">ดูรีวิว<span class="grad-text">ปลูกผม</span></h2>
+      <p class="lead fade-up">ผลลัพธ์ก่อนและหลังการปลูกผมกับ MHC — ภาพจริงจากผู้รับบริการ</p>
+      <div class="ba-grid">
+        <div class="ba" data-ba>
+          <div class="half b"><img src="assets/ba1-before.jpg" alt="ก่อนปลูกผม"></div>
+          <div class="half a"><img src="assets/ba1-after.jpg" alt="หลังปลูกผม"></div>
+          <span class="lbl l">BEFORE</span><span class="lbl r">AFTER</span>
+          <div class="bar"></div>
+        </div>
+        <div class="ba" data-ba>
+          <div class="half b"><img src="assets/ba2-before.jpg" alt="ก่อนปลูกผม"></div>
+          <div class="half a"><img src="assets/ba2-after.jpg" alt="หลังปลูกผม"></div>
+          <span class="lbl l">BEFORE</span><span class="lbl r">AFTER</span>
+          <div class="bar"></div>
+        </div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini fade-up"><div class="ph"><img src="assets/beard.jpg" alt="ปลูกเครา ก่อน-หลัง"></div><div class="cap"><b>ปลูกเครา</b><span>ก่อน – หลัง</span></div></div>
+        <div class="mini fade-up"><div class="ph"><img src="assets/brow-fut.jpg" alt="ปลูกคิ้ววิธี FUT 700 กราฟ"></div><div class="cap"><b>ปลูกคิ้ววิธี FUT 700 กราฟ</b><span>ก่อน – หลังทำ 3 ปี 7 เดือน</span></div></div>
+        <div class="mini fade-up"><div class="ph"><img src="assets/brow-fue.jpg" alt="ปลูกคิ้ววิธี FUE 600 กราฟ"></div><div class="cap"><b>ปลูกคิ้ววิธี FUE 600 กราฟ</b><span>ก่อน – หลังทำ 3 เดือน</span></div></div>
+      </div>
+      <p class="disclaimer">** ผลลัพธ์ที่ได้ขึ้นอยู่เฉพาะบุคคล ** · results may change in an individual</p>
+    </div>
+  </section>
+
+  <!-- ───── BROW / BEARD ───── -->
+  <section class="face">
+    <div class="wrap">
+      <span class="eyebrow">Beyond the scalp</span>
+      <h2 class="h2 split">ศัลยกรรม <span class="grad-text">ปลูกคิ้ว, หนวด, เครา</span></h2>
+      <p class="lead fade-up" style="margin-inline:auto">นอกจากศัลยกรรมปลูกผมแล้ว MHC ยังเชี่ยวชาญในด้านการปลูกคิ้ว ปลูกขนตา ปลูกหนวด และปลูกเคราอีกด้วย</p>
+      <div class="pills">
+        <span class="pill">ปลูกคิ้ว</span><span class="pill">ปลูกขนตา</span><span class="pill">ปลูกหนวด</span><span class="pill">ปลูกเครา</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── DOCTOR ───── -->
+  <section class="doctor" id="doctor">
+    <div class="wrap grid">
+      <div class="doc-photo">
+        <div class="frame reveal-img" data-reveal><img src="assets/doc-desk.jpg" alt="นพ.ธิติวัฒน์ วีรโรจน์รัชกุล"></div>
+      </div>
+      <div>
+        <span class="eyebrow">Professional · ผู้เชี่ยวชาญ</span>
+        <h2 class="doc-name split">นพ.ธิติวัฒน์ <span class="grad-text">วีรโรจน์รัชกุล</span></h2>
+        <p class="lead fade-up" style="margin:0">ศัลยแพทย์ · Thitiwat Wirarojratchakul, MD, FISHRS</p>
+        <ul class="creds" id="creds">
+          <i class="prog"></i>
+          <li><b>FISHRS</b><span>หนึ่งในผู้ดำรงตำแหน่ง Fellow Member of the International Society of Hair Restoration Surgery — มอบให้เฉพาะแพทย์ผู้มีความเชี่ยวชาญอย่างลึกซึ้ง มีจริยธรรมทางวิชาชีพที่เป็นเลิศ มีบทบาทในการพัฒนาองค์ความรู้ การเป็นผู้นำทางวิชาการ และแสดงให้เห็นถึงความมุ่งมั่นในการเรียนรู้อย่างต่อเนื่องในด้านการปลูกผมถาวร</span></li>
+          <li><b>ABHRS Diplomate</b><span>ศัลยแพทย์ปลูกผมอเมริกันบอร์ด — American Board of Hair Restoration Surgery</span></li>
+          <li><b>1 ใน 25 ศัลยแพทย์ปลูกผมที่ดีที่สุดในโลก</b><span>World's Best Hair Transplant Doctors</span></li>
+          <li><b>FUE Europe · FUE Asia · World FUE Institute</b><span>สมาชิกองค์กรวิชาชีพด้านการปลูกผมระดับนานาชาติ</span></li>
+        </ul>
+        <div class="ebhf fade-up">
+          <b>ขอแสดงความยินดีกับ นพ.ธิติวัฒน์ วีรโรจน์รัชกุล</b>
+          <div style="color:var(--muted);font-size:15px">ในโอกาสที่สำเร็จการศึกษาหลักสูตร <span style="color:var(--ink)">Evidence-Based Hair Fellowship (EBHF)</span> จาก Donovan Hair Academy</div>
+          <ul>
+            <li>ซึ่งเป็นหลักสูตรเฉพาะทางเชิงลึกด้านเส้นผมและหนังศีรษะโดยเฉพาะ</li>
+            <li>มีความเข้มข้นด้านการวินิจฉัยและรักษาผมร่วง</li>
+            <li>มุ่งเน้นการวินิจฉัยและรักษาภาวะผมร่วงอย่างเป็นระบบ บนพื้นฐานของหลักฐานเชิงประจักษ์ (Evidence-Based Medicine)</li>
+          </ul>
+        </div>
+        <div class="cert" id="cert"><img src="assets/ishrs.jpg" alt="ใบรับรอง Fellow of the International Society of Hair Restoration Surgery"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── HOSPITAL ───── -->
+  <section class="hospital">
+    <div class="wrap">
+      <div class="hosp-card fade-up">
+        <img class="hosp-doc" src="assets/doc-scrubs.jpg" alt="">
+        <div>
+          <span class="eyebrow">Bumrungrad International Hospital</span>
+          <h2 class="split">ปลูกผม<br>ในโรงพยาบาล</h2>
+          <p style="font-size:clamp(17px,1.6vw,21px);margin:0 0 8px">มาตรฐานโรงพยาบาลชั้นนำ ใจกลางกรุงเทพ</p>
+          <p style="color:#c9dcff;margin:0">โดยศัลยแพทย์ปลูกผมอเมริกันบอร์ด (ABHRS) · Plastic Surgery Center (Building A 16A)</p>
+        </div>
+        <div class="opd">
+          <div style="color:#bfe9ff;font-size:14px">ออกตรวจที่โรงพยาบาลบำรุงราษฎร์</div>
+          <div class="big">ทุกวันจันทร์</div>
+          <div style="font-size:22px;font-weight:500">เวลา 17.00 – 20.00 น.</div>
+          <hr>
+          <div style="font-size:14px;color:#d6e4ff">สำหรับท่านที่สนใจปรึกษาเรื่องการปลูกผมหรือวางแผนการผ่าตัด สามารถนัดหมายเข้ารับการตรวจประเมินกับคุณหมอได้ตามวันและเวลาดังกล่าว</div>
+          <a href="tel:020668888" class="btn ghost magnetic" style="margin-top:20px;border-color:rgba(255,255,255,.4)">โทรนัดหมาย 02-066-8888</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── CONTACT ───── -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <span class="eyebrow">MHC · Change Your Life</span>
+      <div class="giant"><span class="row-l" style="display:block">CHANGE</span><span class="row-r grad-text" style="display:block">YOUR LIFE</span></div>
+      <div class="cta-row" style="justify-content:center">
+        <a href="https://line.me/R/ti/p/~millionhairclinic" target="_blank" rel="noopener" class="btn line magnetic">LINE ปรึกษาออนไลน์</a>
+        <a href="tel:0994451424" class="btn magnetic">โทร 099-445-1424</a>
+      </div>
+      <div class="cgrid">
+        <a class="cbox fade-up" href="https://line.me/R/ti/p/~millionhairclinic" target="_blank" rel="noopener"><small>Line</small><b>Millionhairclinic</b></a>
+        <a class="cbox fade-up" href="tel:0994451424"><small>ติดต่อ / สอบถาม</small><b>099-445-1424<br>02-065-8830</b></a>
+        <a class="cbox fade-up" href="mailto:info@millionhairtransplant.com"><small>Email</small><b>info@millionhair<wbr>transplant.com</b></a>
+        <a class="cbox fade-up" href="https://www.google.com/maps/search/?api=1&query=Million+Hair+Transplant+Center+Nirvana+at+Work+Rama+9" target="_blank" rel="noopener"><small>Address</small><b>877/6 Nirvana at Work ถ.พระราม 9 สวนหลวง กรุงเทพฯ 10250</b></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Million Hair Transplant Centre — MHC</span>
+    <span>*ผลลัพธ์อาจเปลี่ยนแปลงไปในแต่ละบุคคล</span>
+  </div>
+</footer>
+
+<a class="fab" href="https://line.me/R/ti/p/~millionhairclinic" target="_blank" rel="noopener" aria-label="LINE">
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-6C21.3 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8z"/></svg>
+</a>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  /* ── Hero hair field: strands rooted along the bottom, swaying, parting around the cursor ── */
+  const cv = $('#hair'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1, strands = [], grow = reduce ? 1 : 0;
+  const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+  function buildStrands() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(340, W / 4.2));
+    strands = Array.from({ length: n }, (_, i) => {
+      const x = (i / n) * W + (Math.random() - .5) * 14;
+      return {
+        x, len: H * (.28 + Math.random() * .5) * (0.65 + .35 * Math.sin(x / W * Math.PI)),
+        phase: Math.random() * Math.PI * 2, speed: .4 + Math.random() * .6,
+        lean: (Math.random() - .5) * .5, w: .6 + Math.random() * 1.3,
+        hue: Math.random(), bend: 0
+      };
+    });
+  }
+  function drawHair(t) {
+    ctx.clearRect(0, 0, W, H);
+    mouse.x += (mouse.tx - mouse.x) * .12; mouse.y += (mouse.ty - mouse.y) * .12;
+    const segs = 14;
+    for (const s of strands) {
+      const L = s.len * grow;
+      if (L < 2) continue;
+      let x = s.x, y = H + 4, ang = -Math.PI / 2 + s.lean * .4;
+      ctx.beginPath(); ctx.moveTo(x, y);
+      for (let k = 1; k <= segs; k++) {
+        const f = k / segs;
+        ang += Math.sin(t * .0008 * s.speed + s.phase + f * 2.2) * .028 * f + s.lean * .02;
+        const dx = x - mouse.x, dy = y - mouse.y, d2 = dx * dx + dy * dy;
+        if (d2 < 22000) ang += (dx > 0 ? 1 : -1) * (1 - d2 / 22000) * .22 * f;
+        x += Math.cos(ang) * L / segs; y += Math.sin(ang) * L / segs;
+        ctx.lineTo(x, y);
+      }
+      const g = ctx.createLinearGradient(s.x, H, x, y);
+      const c = s.hue > .7 ? '79,210,255' : s.hue > .3 ? '47,107,255' : '120,150,255';
+      g.addColorStop(0, `rgba(${c},0)`); g.addColorStop(.35, `rgba(${c},.28)`); g.addColorStop(1, `rgba(${c},.9)`);
+      ctx.strokeStyle = g; ctx.lineWidth = s.w; ctx.lineCap = 'round'; ctx.stroke();
+      ctx.fillStyle = `rgba(${c},.9)`; ctx.beginPath(); ctx.arc(x, y, s.w * .9, 0, 7); ctx.fill();
+    }
+  }
+  let heroVisible = true;
+  new IntersectionObserver(e => heroVisible = e[0].isIntersecting).observe($('.hero'));
+  function loop(t) { if (heroVisible) drawHair(reduce ? 0 : t); requestAnimationFrame(loop); }
+  buildStrands(); requestAnimationFrame(loop);
+  addEventListener('resize', () => { clearTimeout(buildStrands.t); buildStrands.t = setTimeout(buildStrands, 150); });
+  addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect();
+    mouse.tx = e.clientX - r.left; mouse.ty = e.clientY - r.top;
+  }, { passive: true });
+
+  /* ── Follicles in the regenerative section ── */
+  const roots = $('#roots'), NS = 'http://www.w3.org/2000/svg';
+  [70, 130, 190, 250, 310, 370, 430].forEach((x, i) => {
+    const depth = 380 + (i % 3) * 18, top = 244 - Math.sin(x / 500 * Math.PI) * 14;
+    const sheath = document.createElementNS(NS, 'path');
+    sheath.setAttribute('d', `M${x - 9} ${top} Q ${x - 12} ${depth - 40} ${x - 14} ${depth} M${x + 9} ${top} Q ${x + 12} ${depth - 40} ${x + 14} ${depth}`);
+    sheath.setAttribute('stroke', 'rgba(160,200,255,.28)'); sheath.setAttribute('fill', 'none');
+    const bulb = document.createElementNS(NS, 'ellipse');
+    Object.entries({ cx: x, cy: depth + 6, rx: 15, ry: 18, fill: 'url(#bulb)', class: 'bulb' }).forEach(([k, v]) => bulb.setAttribute(k, v));
+    const hair = document.createElementNS(NS, 'path');
+    const sway = (i % 2 ? 1 : -1) * (20 + i * 4);
+    hair.setAttribute('d', `M${x} ${depth} L${x} ${top} Q ${x + sway * .3} ${top - 90} ${x + sway} ${top - 200 - (i % 3) * 20}`);
+    hair.setAttribute('class', 'hairp');
+    roots.append(sheath, bulb, hair);
+  });
+
+  /* ── Mobile menu ── */
+  $('#burger').addEventListener('click', () => document.body.classList.toggle('menu-open'));
+  $$('#mmenu a').forEach(a => a.addEventListener('click', () => document.body.classList.remove('menu-open')));
+
+  /* ── Nav background on scroll ── */
+  const nav = $('#nav');
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 40);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* ── Without GSAP (offline/CDN blocked): show everything, keep it usable ── */
+  if (!hasGsap) {
+    $('.loader').remove(); document.body.classList.remove('loading'); grow = 1;
+    $$('[data-count]').forEach(e => e.textContent = e.dataset.count);
+    $$('.hairp').forEach(p => p.style.strokeDasharray = 'none');
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* Smooth scroll */
+  let lenis = null;
+  if (!reduce && typeof Lenis !== 'undefined') {
+    lenis = new Lenis({ duration: 1.15, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(time => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+    $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+      const id = a.getAttribute('href'); if (id.length < 2) return;
+      const t = $(id); if (!t) return;
+      e.preventDefault(); lenis.scrollTo(t, { offset: -70 });
+    }));
+  }
+
+  /* Split helpers: Latin hero headline per char; Thai headings per word (keeps combining marks intact) */
+  $$('[data-chars]').forEach(el => {
+    const cs = [...el.textContent], n = cs.length;
+    el.innerHTML = cs.map((c, i) => `<span class="ch" style="background-size:${n * 100}% 100%;background-position:${n > 1 ? i / (n - 1) * 100 : 0}% 0">${c}</span>`).join('');
+  });
+  $$('.split').forEach(el => {
+    const walk = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.append(part); return; }
+            const w = document.createElement('span'); w.className = 'w';
+            const inner = document.createElement('span'); inner.textContent = part;
+            w.append(inner); frag.append(w);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== 'BR') {
+          // gradient spans: wrap whole element so background-clip stays intact
+          if (n.classList.contains('grad-text')) {
+            const w = document.createElement('span'); w.className = 'w';
+            n.replaceWith(w); const inner = document.createElement('span'); inner.append(n); w.append(inner);
+          } else walk(n);
+        }
+      });
+    };
+    walk(el);
+  });
+
+  /* Preloader → intro */
+  const pct = { v: 0 };
+  const intro = gsap.timeline({ paused: true });
+  intro
+    .from('.hero h1 .ch', { yPercent: 110, rotate: 8, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: .035 })
+    .from('.h-fade', { y: 30, opacity: 0, duration: 1, ease: 'expo.out', stagger: .1 }, '-=.9')
+    .from('.hero-card', { clipPath: 'inset(100% 0 0 0 round 28px)', duration: 1.4, ease: 'expo.inOut' }, '-=1.3')
+    .from('.hero-card img', { scale: 1.5, duration: 1.8, ease: 'expo.out' }, '<.2')
+    .from('.chip.float', { scale: .6, opacity: 0, y: 30, duration: .9, ease: 'back.out(1.6)', stagger: .12 }, '-=1')
+    .from('.nav', { y: -80, opacity: 0, duration: .9, ease: 'expo.out' }, '-=1.1')
+    .to({}, { duration: 2.2, onUpdate() { grow = Math.max(grow, gsap.parseEase('expo.out')(this.progress())); } }, 0);
+
+  if (reduce) {
+    $('.loader').remove(); document.body.classList.remove('loading'); grow = 1; intro.progress(1);
+  } else {
+    gsap.timeline()
+      .to('.loader .stroke', { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' })
+      .to(pct, { v: 100, duration: 1.6, ease: 'power2.inOut', onUpdate: () => $('#pct').textContent = Math.round(pct.v) }, 0)
+      .to('.curtain', { scaleY: 1, duration: .7, ease: 'expo.inOut' }, '+=.1')
+      .add(() => { $('.loader').remove(); document.body.classList.remove('loading'); })
+      .set('.curtain', { transformOrigin: 'top' })
+      .to('.curtain', { scaleY: 0, duration: .8, ease: 'expo.inOut' })
+      .add(() => intro.play(), '-=.55');
+  }
+
+  /* Hero parallax on scroll and on pointer */
+  gsap.to('.hero-visual', { yPercent: 18, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('.hero h1', { yPercent: -30, opacity: .2, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  if (fine && !reduce) {
+    const card = $('#heroCard');
+    addEventListener('pointermove', e => {
+      const nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
+      gsap.to(card, { rotateY: nx * 10, rotateX: -ny * 10, transformPerspective: 900, duration: 1, ease: 'power3.out' });
+      $$('.chip.float').forEach(c => gsap.to(c, { x: nx * c.dataset.depth, y: ny * c.dataset.depth, duration: 1.2, ease: 'power3.out' }));
+    });
+  }
+
+  /* Generic reveals */
+  $$('.split').forEach(el => gsap.from(el.querySelectorAll('.w > span'), {
+    yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: .06,
+    scrollTrigger: { trigger: el, start: 'top 85%' }
+  }));
+  $$('.fade-up').forEach(el => gsap.from(el, { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' } }));
+  $$('[data-reveal]').forEach(el => {
+    gsap.from(el, { clipPath: 'inset(0 0 100% 0 round 26px)', duration: 1.5, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 80%' } });
+    const img = el.querySelector('img');
+    gsap.fromTo(img, { yPercent: -10, scale: 1.2 }, { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+  $$('[data-count]').forEach(el => {
+    const o = { v: 0 };
+    gsap.to(o, { v: +el.dataset.count, duration: 2, ease: 'power3.out', onUpdate: () => el.textContent = Math.round(o.v), scrollTrigger: { trigger: el, start: 'top 90%' } });
+  });
+  gsap.from('.stat', { y: 40, opacity: 0, stagger: .1, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: '.stats', start: 'top 88%' } });
+
+  /* Marquee speeds up / reverses with scroll velocity */
+  const mq = $('.marquee-track').getAnimations()[0];
+  ScrollTrigger.create({ onUpdate: s => { if (!mq) return; const v = s.getVelocity() / 600; mq.playbackRate = 1 + Math.min(4, Math.abs(v)) * (v < 0 ? -1 : 1); gsap.delayedCall(.25, () => mq.playbackRate = 1); } });
+
+  /* Technique icons draw themselves */
+  $$('.icon .draw').forEach(p => {
+    const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    gsap.to(p, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', scrollTrigger: { trigger: p.closest('.tcard'), start: 'top 75%', containerAnimation: undefined } });
+  });
+  gsap.from('.icon .dots circle', { scale: 0, transformOrigin: 'center', stagger: .05, duration: .6, ease: 'back.out(3)', scrollTrigger: { trigger: '#tech', start: 'top 60%' } });
+
+  /* Horizontal pinned scroll on wide screens, plain stack on small */
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 981px)', () => {
+    const track = $('#techTrack');
+    const dist = () => track.scrollWidth - innerWidth;
+    const tween = gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#techPin', start: 'top top', end: () => '+=' + dist(), pin: true, scrub: 1, invalidateOnRefresh: true } });
+    $$('.tcard', track).forEach(c => gsap.from(c, { rotateY: -18, opacity: .3, scale: .9, transformPerspective: 1200, ease: 'none', scrollTrigger: { trigger: c, containerAnimation: tween, start: 'left right', end: 'left 45%', scrub: true } }));
+  });
+  mm.add('(max-width: 980px)', () => {
+    $$('.tcard').forEach(c => gsap.from(c, { y: 70, opacity: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: c, start: 'top 88%' } }));
+  });
+
+  /* Follicle growth scrubbed by scroll */
+  $$('.hairp').forEach(p => { const l = p.getTotalLength(); p.style.strokeDasharray = l; p.style.strokeDashoffset = l; });
+  gsap.timeline({ scrollTrigger: { trigger: '#follicle', start: 'top 80%', end: 'bottom 35%', scrub: 1 } })
+    .from('.bulb', { scale: 0, transformOrigin: 'center', stagger: .05, duration: .4 })
+    .to('.hairp', { strokeDashoffset: 0, stagger: .06, duration: 1, ease: 'power1.out' }, '<.1');
+
+  /* Before/after: halves part from the seam, the glowing seam draws top to bottom */
+  $$('[data-ba]').forEach(el => {
+    gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 75%' } })
+      .from(el.querySelector('.bar'), { scaleY: 0, transformOrigin: 'top', duration: .8, ease: 'expo.inOut' })
+      .from(el.querySelector('.half.b'), { clipPath: 'inset(0 0 0 100%)', duration: 1.2, ease: 'expo.inOut' }, '-=.3')
+      .from(el.querySelector('.half.a'), { clipPath: 'inset(0 100% 0 0)', duration: 1.2, ease: 'expo.inOut' }, '<')
+      .from(el.querySelectorAll('img'), { scale: 1.35, duration: 1.6, ease: 'expo.out' }, '<')
+      .from(el.querySelectorAll('.lbl'), { y: 20, opacity: 0, stagger: .1, duration: .6, ease: 'expo.out' }, '-=.8');
+  });
+
+  /* Brow/beard pills pop in */
+  gsap.from('.pill', { y: 40, opacity: 0, scale: .8, stagger: .08, duration: .9, ease: 'back.out(2)', scrollTrigger: { trigger: '.pills', start: 'top 88%' } });
+
+  /* Credentials timeline line fills while scrolling */
+  gsap.to('#creds .prog', { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#creds', start: 'top 70%', end: 'bottom 60%', scrub: true } });
+  gsap.from('#creds li', { x: 40, opacity: 0, stagger: .15, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: '#creds', start: 'top 80%' } });
+
+  /* Certificate tilts toward the pointer */
+  const cert = $('#cert');
+  if (fine && !reduce) {
+    cert.addEventListener('pointermove', e => {
+      const r = cert.getBoundingClientRect();
+      gsap.to(cert, { rotateY: ((e.clientX - r.left) / r.width - .5) * 16, rotateX: -((e.clientY - r.top) / r.height - .5) * 16, transformPerspective: 900, duration: .6, ease: 'power3.out' });
+    });
+    cert.addEventListener('pointerleave', () => gsap.to(cert, { rotateX: 0, rotateY: 0, duration: 1, ease: 'elastic.out(1,.5)' }));
+  }
+
+  /* Contact: giant words slide in from opposite sides */
+  gsap.from('.giant .row-l', { xPercent: -40, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 30%', scrub: 1 } });
+  gsap.from('.giant .row-r', { xPercent: 40, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 30%', scrub: 1 } });
+
+  /* Custom cursor + magnetic buttons */
+  if (fine && !reduce) {
+    const cur = $('.cursor'), dot = $('.cursor-dot');
+    const qx = gsap.quickTo(cur, 'x', { duration: .45, ease: 'power3' }), qy = gsap.quickTo(cur, 'y', { duration: .45, ease: 'power3' });
+    addEventListener('pointermove', e => { qx(e.clientX); qy(e.clientY); gsap.set(dot, { x: e.clientX, y: e.clientY }); });
+    $$('a, button').forEach(el => {
+      el.addEventListener('pointerenter', () => cur.classList.add('hover'));
+      el.addEventListener('pointerleave', () => cur.classList.remove('hover'));
+    });
+    $$('.magnetic').forEach(el => {
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect();
+        gsap.to(el, { x: (e.clientX - r.left - r.width / 2) * .3, y: (e.clientY - r.top - r.height / 2) * .4, duration: .5, ease: 'power3.out' });
+      });
+      el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: .9, ease: 'elastic.out(1,.4)' }));
+    });
+  }
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+</body>
+</html>
