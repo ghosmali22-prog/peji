@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kulranis Khamsuphap</title>
+<meta name="description" content="Kulranis Khamsuphap — bank accounts and contact.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="KULRANIS KHAMSUPHAP">
+<meta property="og:description" content="Bank accounts & contact · บัญชีธนาคารและติดต่อ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<style>
+  /* ============================================================
+     EDIT HERE — colors. Black + gold, taken from the black-hole art.
+     ============================================================ */
+  :root {
+    --bg: #000;
+    --gold-hi: #fff4d2;
+    --gold: #f2c766;
+    --gold-mid: #d39a35;
+    --gold-deep: #8f5a14;
+    --ember: #c4621a;
+    --ink: #f7efe0;
+    --muted: #b5a68a;
+    --edge: rgba(242, 199, 102, .28);
+    --font-display: "Cinzel", Georgia, serif;
+    --font-body: "Inter", "Sarabun", system-ui, sans-serif;
+    --font-th: "Sarabun", system-ui, sans-serif;
+    --gold-text: linear-gradient(180deg, #fff6d6 0%, #f6d27c 30%, #d39a35 55%, #ffe7a6 68%, #b77b1f 85%, #7d4d0e 100%);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font-body); overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { font: inherit; color: inherit; }
+  .th { font-family: var(--font-th); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Full-screen black hole canvas (stars + disk + lensing) */
+  #space { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; z-index: 1; height: 250vh; }
+  .stage {
+    position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+    perspective: 1000px; pointer-events: none;
+  }
+  .title {
+    position: absolute; left: 0; right: 0; bottom: 17%;
+    display: flex; flex-direction: column; align-items: center;
+    transform-style: preserve-3d;
+  }
+  .word {
+    margin: 0; display: flex; justify-content: center; line-height: 1.02;
+    font-family: var(--font-display); font-weight: 700; white-space: nowrap;
+    transform-style: preserve-3d;
+  }
+  .word.l1 { font-size: clamp(40px, 13.5vw, 112px); letter-spacing: .1em; padding-left: .1em; }
+  .word.l2 { font-size: clamp(32px, 10.6vw, 96px); letter-spacing: .08em; padding-left: .08em; }
+  .word.l3 { font-family: var(--font-th); font-weight: 600; font-size: clamp(17px, 5vw, 32px); letter-spacing: .06em; margin-top: .55em; }
+  .ch { display: inline-block; transform-style: preserve-3d; will-change: transform, opacity, filter; }
+  .ch > i {
+    display: inline-block; font-style: normal;
+    background: var(--gold-text);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter:
+      drop-shadow(0 1px 0 #c8902c)
+      drop-shadow(0 1px 0 #a06c18)
+      drop-shadow(0 1px 0 #7a4e0d)
+      drop-shadow(0 2px 0 #4f3106)
+      drop-shadow(0 10px 18px rgba(0, 0, 0, .9))
+      drop-shadow(0 0 22px rgba(255, 180, 70, .25));
+    animation: dropIn 1.2s cubic-bezier(.2, .9, .25, 1.1) backwards;
+    animation-delay: calc(var(--i) * 55ms + 700ms);
+  }
+  .word.l3 .ch > i { filter: drop-shadow(0 1px 0 #7a4e0d) drop-shadow(0 4px 10px rgba(0, 0, 0, .9)); }
+  @keyframes dropIn { from { opacity: 0; transform: translateY(-50px) rotateX(90deg) scale(.6); } }
+  .word .gap { width: .35em; }
+
+  .scroll-hint {
+    position: absolute; bottom: max(22px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px; white-space: nowrap;
+    font-size: 10px; letter-spacing: .4em; text-transform: uppercase; color: var(--muted);
+    animation: fadeUp 1s 2s backwards;
+  }
+  .scroll-hint .th { font-size: 13px; letter-spacing: .04em; text-transform: none; color: var(--gold); }
+  .chev { width: 18px; height: 18px; border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold); transform: rotate(45deg); animation: bob 1.6s ease-in-out infinite; margin-bottom: 4px; }
+  @keyframes bob { 50% { transform: translateY(6px) rotate(45deg); opacity: .4; } }
+  @keyframes fadeUp { from { opacity: 0; translate: 0 16px; } }
+
+  /* ---------- CONTENT ---------- */
+  main { position: relative; z-index: 2; width: min(100%, 560px); margin: -70vh auto 0; padding: 0 0 70px; }
+  .section-title {
+    display: flex; align-items: baseline; gap: 10px; margin: 60px 20px 6px;
+    font-family: var(--font-display); font-weight: 600; font-size: 14px; letter-spacing: .3em; text-transform: uppercase;
+    background: var(--gold-text); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .section-title .th { font-size: 13px; letter-spacing: .02em; text-transform: none; }
+  .section-line { height: 1px; margin: 0 20px 22px; background: linear-gradient(90deg, var(--gold-mid), transparent); opacity: .6; }
+
+  .rv { opacity: 0; transform: translateY(40px); transition: opacity .9s ease, transform 1s cubic-bezier(.2,.8,.2,1); }
+  .rv.in { opacity: 1; transform: none; }
+
+  /* Swipeable 3D card carousel */
+  .slider {
+    display: flex; gap: 0; overflow-x: auto; overflow-y: visible; scroll-snap-type: x mandatory;
+    padding: 26px 5% 10px; scrollbar-width: none; perspective: 1100px;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+  }
+  .slider::-webkit-scrollbar { display: none; }
+  .slide { flex: 0 0 90%; scroll-snap-align: center; padding: 0 2.5%; transform-style: preserve-3d; }
+  .slider.single { justify-content: center; }
+
+  .card {
+    --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 30%;
+    position: relative; border-radius: 20px; cursor: pointer;
+    transform-style: preserve-3d; transition: transform .35s cubic-bezier(.2,.8,.2,1);
+    touch-action: pan-x pan-y;
+  }
+  .card-inner {
+    position: relative; min-height: 210px; border-radius: inherit; overflow: hidden;
+    transform: rotateX(var(--rx)) rotateY(var(--ry)); transform-style: preserve-3d;
+    transition: transform .25s ease-out;
+    background:
+      radial-gradient(120% 90% at 85% 0%, rgba(242, 199, 102, .22), transparent 55%),
+      radial-gradient(90% 80% at 0% 100%, rgba(196, 98, 26, .25), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,.025) 0 2px, transparent 2px 5px),
+      linear-gradient(145deg, #1a1611 0%, #070605 45%, #120e09 100%);
+    box-shadow:
+      0 40px 60px -28px rgba(255, 170, 60, .35),
+      0 30px 50px -20px rgba(0, 0, 0, .95),
+      inset 0 1px 0 rgba(255, 236, 190, .35);
+    padding: 6% 7%;
+    display: flex; flex-direction: column;
+  }
+  /* gold foil frame */
+  .card-inner::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
+    background: linear-gradient(135deg, #fff1c4, #c48a2a 30%, #5b3a0a 50%, #f2c766 70%, #8f5a14);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  /* sheen that follows the finger */
+  .card-inner::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(circle at var(--mx) var(--my), rgba(255, 226, 160, .28), transparent 42%),
+      linear-gradient(115deg, transparent 38%, rgba(255, 240, 200, .16) 47%, rgba(255, 200, 120, .08) 53%, transparent 62%);
+    background-size: 100% 100%, 300% 100%;
+    animation: sweep 6s ease-in-out infinite;
+  }
+  @keyframes sweep { 0%, 35% { background-position: 0 0, 120% 0; } 75%, 100% { background-position: 0 0, -20% 0; } }
+  .ring-bg { /* faint black-hole emblem engraved on the card */
+    position: absolute; right: -22%; bottom: -45%; width: 75%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, #000 0 30%, rgba(242,199,102,.35) 31%, transparent 34%, transparent 40%, rgba(242,199,102,.10) 41%, transparent 60%);
+    opacity: .45;
+  }
+  .gold { background: var(--gold-text); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .c-top { display: flex; justify-content: space-between; align-items: flex-start; transform: translateZ(30px); position: relative; }
+  .bank-mark { display: flex; align-items: center; gap: 10px; }
+  .bank-badge {
+    width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    background: radial-gradient(circle at 35% 30%, #2a241b, #0a0806); border: 1px solid var(--edge);
+    font-family: var(--font-display); font-weight: 700; font-size: 14px; position: relative;
+  }
+  .bank-badge .stripe { position: absolute; bottom: 8px; left: 10px; right: 10px; height: 2.5px; border-radius: 2px;
+    background: linear-gradient(90deg, #e4007e, #7b2a90, #0094d8, #4cb848, #f7a600, #e60012); }
+  .bank-name { font-weight: 700; font-size: clamp(14px, 4.2vw, 18px); letter-spacing: .04em; line-height: 1.15; }
+  .bank-name small { display: block; font-family: var(--font-th); font-weight: 500; font-size: 11px; letter-spacing: 0; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+  .acc-type { text-align: right; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+  .acc-type .th { display: block; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--gold); }
+  .chip {
+    margin-top: 5%; width: 13%; aspect-ratio: 1.3; border-radius: 6px; position: relative; transform: translateZ(25px);
+    background: linear-gradient(135deg, #fff0c0, #d4a344 35%, #f7dc8c 55%, #9b6a1c);
+    box-shadow: inset 0 0 0 1px rgba(60, 35, 0, .35), 0 2px 6px rgba(0,0,0,.6);
+  }
+  .chip::before { content: ""; position: absolute; inset: 0 33%; border-left: 1px solid rgba(80,50,0,.45); border-right: 1px solid rgba(80,50,0,.45); }
+  .chip::after { content: ""; position: absolute; left: 0; right: 0; top: 48%; height: 1px; background: rgba(80,50,0,.45); }
+  .acc-no {
+    margin-top: 4%; font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(21px, 6.8vw, 32px); letter-spacing: .1em; white-space: nowrap;
+    transform: translateZ(45px); position: relative;
+    filter: drop-shadow(0 1px 0 #6b430a) drop-shadow(0 3px 6px rgba(0,0,0,.8));
+  }
+  .c-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 3.5%; transform: translateZ(30px); position: relative; }
+  .c-bottom .lbl { font-size: 8.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .holder-en { font-family: var(--font-display); font-weight: 700; font-size: clamp(11px, 3.4vw, 16px); letter-spacing: .06em; white-space: nowrap; }
+  .holder-th { font-family: var(--font-th); font-weight: 600; font-size: clamp(12px, 3.6vw, 15px); color: var(--gold-hi); margin-top: 1px; }
+  .tap { font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-align: right; }
+  .tap svg { width: 18px; height: 18px; display: block; margin: 0 0 3px auto; stroke: var(--gold); }
+  .card-glow { width: 76%; height: 26px; margin: 14px auto 0; border-radius: 50%; background: radial-gradient(ellipse, rgba(242,170,70,.45), transparent 70%); filter: blur(8px); }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 10px; border-radius: 14px; cursor: pointer;
+    font-weight: 600; font-size: 13.5px; letter-spacing: .02em; line-height: 1.2; text-align: center;
+    background: linear-gradient(180deg, rgba(255, 230, 170, .09), rgba(255, 230, 170, .03));
+    border: 1px solid var(--edge); color: var(--ink); transition: transform .15s, background .2s;
+  }
+  .btn .th { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+  .btn svg { width: 17px; height: 17px; stroke: var(--gold); flex: none; }
+  .btn.primary { background: linear-gradient(180deg, #ffe39a, #d39a35 55%, #a8701a); color: #1a1006; border-color: #ffe7a6; box-shadow: 0 10px 26px -10px rgba(242,170,70,.8), inset 0 1px 0 #fff6d6; }
+  .btn.primary .th { color: #3d2606; }
+  .btn.primary svg { stroke: #1a1006; }
+  .btn:active { transform: scale(.97); }
+  .btn.ok { background: linear-gradient(180deg, #fff3cc, #f2c766); color: #1a1006; }
+
+  .dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+  .dots button { width: 8px; height: 8px; border-radius: 4px; border: 0; padding: 0; background: rgba(242,199,102,.3); cursor: pointer; transition: width .3s, background .3s; }
+  .dots button.on { width: 26px; background: var(--gold); }
+  .slider.single + .dots { display: none; }
+  .swipe-note { text-align: center; font-size: 11px; color: var(--muted); margin-top: 10px; letter-spacing: .04em; }
+
+  /* Phones */
+  .phones { display: grid; gap: 14px; padding: 0 20px; }
+  .phone {
+    position: relative; display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 20px;
+    background: linear-gradient(160deg, rgba(255, 230, 170, .08), rgba(255, 230, 170, .02));
+    border: 1px solid var(--edge); overflow: hidden;
+  }
+  .phone::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
+    background: conic-gradient(from var(--a, 0deg), transparent 0 72%, #fff1c4, #d39a35, transparent 96%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: orbit 4s linear infinite;
+  }
+  @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes orbit { to { --a: 360deg; } }
+  .phone .copy-btn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
+  .phone .ico {
+    flex: none; width: 50px; height: 50px; border-radius: 15px; display: grid; place-items: center;
+    background: linear-gradient(180deg, #ffe39a, #d39a35 55%, #8f5a14);
+    box-shadow: 0 8px 22px -8px rgba(242,170,70,.8), inset 0 1px 0 #fff6d6;
+  }
+  .phone .ico svg { width: 22px; height: 22px; stroke: #1a1006; }
+  .phone .num { font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 5.6vw, 24px); letter-spacing: .05em; white-space: nowrap; }
+  .phone .hint { display: block; font-size: 10.5px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; }
+  .phone .hint .th { letter-spacing: 0; text-transform: none; }
+  .phone .call { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--edge); background: rgba(255,230,170,.06); }
+  .phone .call svg { width: 20px; height: 20px; stroke: var(--gold); }
+  .phone.copied .ico { background: linear-gradient(180deg, #fff6d6, #f2c766); }
+
+  footer { text-align: center; margin-top: 60px; font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+  footer b { display: block; font-family: var(--font-display); font-size: 14px; letter-spacing: .28em; margin-bottom: 6px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 50;
+    transform: translate(-50%, 150%); opacity: 0; white-space: nowrap;
+    display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px;
+    background: rgba(12, 9, 5, .92); border: 1px solid var(--edge); font-weight: 600; font-size: 14px;
+    box-shadow: 0 14px 40px -10px rgba(242,170,70,.5);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    transition: transform .45s cubic-bezier(.2,1.2,.3,1), opacity .3s;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  .toast .dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(180deg, #ffe39a, #d39a35); }
+  .toast .dot svg { width: 13px; height: 13px; stroke: #1a1006; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="space" aria-hidden="true"></canvas>
+
+<!-- ======================= HERO ======================= -->
+<section class="hero" id="hero">
+  <div class="stage">
+    <div class="title" id="title">
+      <!-- EDIT HERE — name on the opening screen -->
+      <h1 class="sr-only">Kulranis Khamsuphap · กุลณิศ ขำสุภาพ</h1>
+      <div class="word l1" data-split aria-hidden="true">KULRANIS</div>
+      <div class="word l2" data-split aria-hidden="true">KHAMSUPHAP</div>
+      <div class="word l3" data-split aria-hidden="true">กุลณิศ ขำสุภาพ</div>
+    </div>
+    <div class="scroll-hint" id="hint"><div class="chev"></div><span class="th">เลื่อนลงเพื่อดูบัญชี</span>Scroll down</div>
+  </div>
+</section>
+
+<!-- ======================= CONTENT ======================= -->
+<main>
+  <div class="section-title rv">Bank accounts <span class="th">· บัญชีธนาคาร</span></div>
+  <div class="section-line rv"></div>
+
+  <div class="slider rv" id="slider"></div>
+  <div class="dots" id="dots"></div>
+
+  <div class="section-title rv">Contact <span class="th">· ติดต่อ</span></div>
+  <div class="section-line rv"></div>
+
+  <!-- EDIT HERE — phone numbers. data-copy = copied text, href = number dialed -->
+  <div class="phones">
+    <div class="phone rv">
+      <button class="copy-btn" data-copy="0652639874" data-label="Phone number">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span><span class="num gold">06-5263-9874</span><span class="hint">Tap to copy · <span class="th">แตะเพื่อคัดลอก</span></span></span>
+      </button>
+      <a class="call" href="tel:0652639874" aria-label="Call 06-5263-9874"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="phone rv">
+      <button class="copy-btn" data-copy="0863886822" data-label="Phone number">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span><span class="num gold">086-388-6822</span><span class="hint">Tap to copy · <span class="th">แตะเพื่อคัดลอก</span></span></span>
+      </button>
+      <a class="call" href="tel:0863886822" aria-label="Call 086-388-6822"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+
+  <footer class="rv"><b class="gold">KULRANIS KHAMSUPHAP</b>© <span id="year"></span></footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg></span>
+  <span id="toastText">Copied</span>
+</div>
+
+<script>
+/* ============================================================
+   EDIT HERE — bank accounts. Add another { … } block for each new bank;
+   the cards become swipeable automatically.
+   ============================================================ */
+const BANKS = [
+  {
+    mark: 'LH',                                   // short logo text on the card
+    stripe: true,                                 // LH Bank's coloured stripe under the mark
+    bank: 'LH Bank',
+    bankTh: 'ธนาคารแลนด์ แอนด์ เฮ้าส์',
+    type: 'All Free',
+    typeTh: 'บัญชี ออลล์ฟรี',
+    number: '242-2-56264-1',
+    nameEn: 'KULRANIS KHAMSUPHAP',
+    nameTh: 'กุลณิศ ขำสุภาพ',
+  },
+];
+
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* =================== BLACK HOLE =================== */
+  const cv = document.getElementById('space');
+  const ctx = cv.getContext('2d');
+  let W, H, dpr, cx, cy, rs;
+  const small = innerWidth < 700;
+  const N_DISK = small ? 7500 : 12000, N_LENS = small ? 3800 : 6000, N_STARS = small ? 220 : 380;
+  // Colour buckets (hot white → gold → ember), drawn with additive blending
+  const COLORS = ['#fff7ea', '#ffe2a8', '#ffc56a', '#f0a043', '#d07a2a', '#9c5218'];
+  const disk = COLORS.map(() => []), lens = COLORS.map(() => []);
+  const rnd = Math.random;
+
+  for (let i = 0; i < N_DISK; i++) {
+    const u = Math.pow(rnd(), 1.7);                      // denser toward the inner edge
+    const r = 1.5 + u * 4.8;                            // in shadow radii
+    const b = Math.min(5, Math.floor(u * 5.2 + rnd() * 1.4));
+    disk[b].push({
+      r, a: rnd() * Math.PI * 2, w: .55 * Math.pow(1.55 / r, 1.5) * (.9 + rnd() * .2),
+      z: (rnd() - .5) * .07 * r,                          // disk thickness
+      s: .7 + rnd() * (b < 2 ? 1.6 : 1.2),
+      dx: rnd() * 2 - 1, dy: rnd() * 2 - 1, v: .4 + rnd() * 1.2,   // explosion direction/speed
+    });
+  }
+  for (let i = 0; i < N_LENS; i++) {
+    // Light from the far side of the disk, bent over the top and under the bottom of the hole
+    const a = rnd() * Math.PI * 2, sn = Math.sin(a);
+    const thick = sn < 0 ? .3 + 1.1 * -sn : .06 + .18 * sn;   // fat arc on top, thin one below
+    const u = Math.pow(rnd(), 1.8);
+    const b = Math.min(5, Math.floor(u * 4 + rnd() * 1.6));
+    lens[b].push({
+      r: 1.06 + u * thick * 1.25, a, w: .32 * (.9 + rnd() * .2), s: .5 + rnd() * 1.1,
+      dx: rnd() * 2 - 1, dy: rnd() * 2 - 1, v: .4 + rnd() * 1.2,
+    });
+  }
+  const stars = Array.from({ length: N_STARS }, () => ({
+    x: rnd(), y: rnd(), r: rnd() < .06 ? 1.3 + rnd() : .3 + rnd() * .8, t: rnd() * 6.28, sp: .5 + rnd() * 2,
+    c: rnd() < .15 ? '#cfe0ff' : rnd() < .3 ? '#ffe2b0' : '#ffffff',
+  }));
+
+  function size() {
+    dpr = Math.min(small ? 1.5 : 2, devicePixelRatio || 1);
+    W = cv.width = Math.round(innerWidth * dpr);
+    H = cv.height = Math.round(innerHeight * dpr);
+    cx = W * .5; cy = H * (innerWidth < innerHeight ? .36 : .4);
+    rs = Math.min(W * .19, H * .13);
+  }
+  size(); addEventListener('resize', size);
+
+  const TILT = -.13;                      // disk tilt (radians) like the reference art
+  const cosT = Math.cos(TILT), sinT = Math.sin(TILT);
+  const FLAT = .11;                       // how edge-on the disk is
+
+  function drawBucket(list, color, t, burst, fade, mode, front) {
+    ctx.fillStyle = color;
+    for (let k = 0; k < list.length; k++) {
+      const p = list[k];
+      const ang = p.a + p.w * t;
+      const ca = Math.cos(ang), sa = Math.sin(ang);
+      let x, y, size = p.s;
+      if (mode === 0) {                    // accretion disk
+        if ((sa >= 0) !== front) continue;
+        const lx = p.r * ca, ly = (p.r * sa) * FLAT + p.z;
+        x = lx * cosT - ly * sinT; y = lx * sinT + ly * cosT;
+        size *= 1 + .55 * -ca;             // left side brighter: material coming toward us
+      } else {                             // lensed ring around the shadow
+        x = p.r * ca; y = p.r * sa * .97;
+        size *= 1 + .35 * -ca;
+      }
+      x = cx + x * rs; y = cy + y * rs;
+      if (burst > 0) {
+        const d = burst * p.v * rs * 9;
+        x += p.dx * d; y += p.dy * d;
+      }
+      const sz = size * dpr * fade;
+      ctx.fillRect(x, y, sz, sz);
+    }
+  }
+
+  let scrollP = 0, shownP = 0;
+  function draw(now) {
+    const t = reduce ? 0 : now / 1000;
+    shownP += (scrollP - shownP) * (reduce ? 1 : .1);
+    const burst = Math.pow(ease(clamp((shownP - .02) / .78)), 1.15);
+    const fade = 1 - clamp((burst - .45) / .55);
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+    // stars
+    for (const s of stars) {
+      ctx.globalAlpha = .35 + .65 * Math.abs(Math.sin(s.t + t * s.sp * .6));
+      ctx.fillStyle = s.c;
+      const r = s.r * dpr;
+      ctx.fillRect(s.x * W - r / 2, s.y * H - r / 2, r, r);
+      if (s.r > 1.3) { ctx.fillRect(s.x * W - r * 2, s.y * H - .5, r * 4, 1); ctx.fillRect(s.x * W - .5, s.y * H - r * 2, 1, r * 4); }
+    }
+    ctx.globalAlpha = 1;
+
+    if (fade > 0) {
+      ctx.globalCompositeOperation = 'lighter';
+      // warm haze behind everything
+      const g = ctx.createRadialGradient(cx, cy, rs * .9, cx, cy, rs * 5.5);
+      g.addColorStop(0, `rgba(255,190,110,${.32 * fade})`);
+      g.addColorStop(.35, `rgba(200,110,40,${.12 * fade})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+      // glowing body of the disk (a squashed radial gradient) and the lensed halo
+      if (burst < .98) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(TILT); ctx.scale(1, FLAT * 1.3);
+        const dg = ctx.createRadialGradient(0, 0, rs * 1.2, 0, 0, rs * 6.5);
+        dg.addColorStop(0, `rgba(255,235,200,${.55 * fade * (1 - burst)})`);
+        dg.addColorStop(.25, `rgba(255,170,80,${.28 * fade * (1 - burst)})`);
+        dg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = dg; ctx.beginPath(); ctx.arc(0, 0, rs * 6.5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        const hg = ctx.createRadialGradient(cx, cy - rs * .15, rs, cx, cy - rs * .15, rs * 2.3);
+        hg.addColorStop(0, `rgba(255,230,190,${.5 * fade * (1 - burst)})`);
+        hg.addColorStop(.4, `rgba(240,150,60,${.18 * fade * (1 - burst)})`);
+        hg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = hg; ctx.fillRect(cx - rs * 3, cy - rs * 3, rs * 6, rs * 6);
+      }
+      ctx.globalAlpha = .9 * fade;
+      for (let b = 5; b >= 0; b--) drawBucket(disk[b], COLORS[b], t, burst, 1, 0, false);
+      for (let b = 5; b >= 0; b--) drawBucket(lens[b], COLORS[b], t, burst, 1, 1, false);
+
+      // event horizon shadow + thin photon ring
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = fade;
+      const hr = rs * (1 - burst * .6);
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineWidth = Math.max(1, rs * .025);
+      ctx.shadowColor = 'rgba(255,220,170,.9)'; ctx.shadowBlur = rs * .25;
+      ctx.strokeStyle = `rgba(255,238,210,${.85 * fade})`;
+      ctx.beginPath(); ctx.arc(cx, cy, hr * 1.03, 0, Math.PI * 2); ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // near side of the disk passes in front of the hole
+      ctx.globalAlpha = .95 * fade;
+      for (let b = 5; b >= 0; b--) drawBucket(disk[b], COLORS[b], t, burst, 1, 0, true);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(frame);
+  }
+
+  /* =================== HERO TITLE =================== */
+  const letters = [];
+  let idx = 0;
+  document.querySelectorAll('[data-split]').forEach((word, w) => {
+    const text = word.textContent.trim();
+    word.textContent = '';
+    // Thai uses combining vowels/tone marks: split into grapheme clusters, not code points
+    const parts = window.Intl && Intl.Segmenter
+      ? [...new Intl.Segmenter('th', { granularity: 'grapheme' }).segment(text)].map(s => s.segment)
+      : [...text];
+    parts.forEach((c, i) => {
+      if (c === ' ') { const g = document.createElement('span'); g.className = 'gap'; word.appendChild(g); return; }
+      const outer = document.createElement('span'); outer.className = 'ch';
+      const inner = document.createElement('i'); inner.textContent = c; inner.style.setProperty('--i', idx++);
+      outer.appendChild(inner); word.appendChild(outer);
+      const off = i - (parts.length - 1) / 2;
+      letters.push({
+        el: outer,
+        x: off * (60 + rnd() * 50), y: -(120 + rnd() * 260) * (w === 2 ? -.6 : 1),
+        z: 200 + rnd() * 600, rx: (rnd() - .5) * 260, ry: off * 25 + (rnd() - .5) * 90, rz: (rnd() - .5) * 160,
+        from: .02 + w * .03 + rnd() * .1, to: .62 + rnd() * .1,
+      });
+    });
+  });
+
+  const hero = document.getElementById('hero');
+  const title = document.getElementById('title');
+  const hint = document.getElementById('hint');
+  function readScroll() { scrollP = clamp(scrollY / Math.max(1, hero.offsetHeight - innerHeight)); }
+  addEventListener('scroll', readScroll, { passive: true });
+  addEventListener('resize', readScroll);
+  readScroll();
+
+  function frame(now) {
+    const p = shownP;
+    const sc = Math.min(1, innerWidth / 600) * .8 + .2;
+    letters.forEach(L => {
+      const t = ease(clamp((p - L.from) / (L.to - L.from)));
+      L.el.style.transform = `translate3d(${L.x * t * sc}px, ${L.y * t * sc}px, ${L.z * t}px) rotateX(${L.rx * t}deg) rotateY(${L.ry * t}deg) rotateZ(${L.rz * t}deg)`;
+      L.el.style.opacity = 1 - clamp((t - .45) / .5);
+      L.el.style.filter = t > .02 ? `blur(${(t * 8).toFixed(2)}px)` : '';
+    });
+    const f = reduce ? 0 : Math.sin(now / 1500) * (1 - p);
+    title.style.transform = `translateY(${f * 6}px)`;
+    hint.style.opacity = 1 - clamp(p / .06);
+    draw(now);
+  }
+  // draw() schedules the next frame; frame() runs it
+  requestAnimationFrame(frame);
+
+  /* =================== BANK CARDS =================== */
+  const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8"/></svg>';
+  const ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>';
+  const ICON_TAP = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-4.6-2.2L4 15.5a1.5 1.5 0 0 1 2.3-1.9L9 16V11"/></svg>';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const slider = document.getElementById('slider');
+  const dots = document.getElementById('dots');
+
+  BANKS.forEach((b, i) => {
+    const digits = b.number.replace(/\D/g, '');
+    const all = `Bank: ${b.bank} (${b.bankTh})\nAccount number: ${b.number}\nAccount name: ${b.nameEn} (${b.nameTh})`;
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.innerHTML = `
+      <div class="card" tabindex="0" role="button" aria-label="Copy ${esc(b.bank)} account number" data-copy="${esc(digits)}" data-label="Account number">
+        <div class="card-inner">
+          <div class="ring-bg"></div>
+          <div class="c-top">
+            <div class="bank-mark">
+              <span class="bank-badge"><span class="gold">${esc(b.mark)}</span>${b.stripe ? '<span class="stripe"></span>' : ''}</span>
+              <span class="bank-name gold">${esc(b.bank)}<small>${esc(b.bankTh)}</small></span>
+            </div>
+            <div class="acc-type">${esc(b.type)}<span class="th">${esc(b.typeTh)}</span></div>
+          </div>
+          <div class="chip"></div>
+          <div class="acc-no gold">${esc(b.number)}</div>
+          <div class="c-bottom">
+            <div>
+              <div class="lbl">Account name · <span class="th">ชื่อบัญชี</span></div>
+              <div class="holder-en gold">${esc(b.nameEn)}</div>
+              <div class="holder-th">${esc(b.nameTh)}</div>
+            </div>
+            <div class="tap">${ICON_TAP}Tap to copy</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-glow"></div>
+      <div class="actions">
+        <button class="btn primary" data-copy="${esc(digits)}" data-label="Account number">${ICON_COPY}<span>Copy number<span class="th">คัดลอกเลขบัญชี</span></span></button>
+        <button class="btn" data-copy="${esc(all)}" data-label="All details">${ICON_LIST}<span>Copy all<span class="th">คัดลอกทั้งหมด</span></span></button>
+      </div>`;
+    slider.appendChild(slide);
+    const d = document.createElement('button');
+    d.setAttribute('aria-label', `Show ${b.bank}`);
+    d.addEventListener('click', () => slide.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+    dots.appendChild(d);
+  });
+  if (BANKS.length < 2) slider.classList.add('single');
+  else {
+    const note = document.createElement('div');
+    note.className = 'swipe-note';
+    note.innerHTML = '← Swipe for more banks · <span class="th">ปัดเพื่อดูธนาคารอื่น</span> →';
+    dots.after(note);
+  }
+
+  // Coverflow: cards turn in 3D as they slide away from the centre
+  const slides = [...slider.children];
+  function coverflow() {
+    const mid = slider.scrollLeft + slider.clientWidth / 2;
+    let best = 0, bestD = 1e9;
+    slides.forEach((s, i) => {
+      const c = s.offsetLeft + s.offsetWidth / 2;
+      const d = (c - mid) / s.offsetWidth;
+      if (Math.abs(d) < bestD) { bestD = Math.abs(d); best = i; }
+      const card = s.querySelector('.card');
+      card.style.transform = `translateZ(${-Math.abs(d) * 160}px) rotateY(${clamp(d, -1.2, 1.2) * -38}deg) scale(${1 - Math.min(.15, Math.abs(d) * .12)})`;
+      s.style.opacity = 1 - Math.min(.55, Math.abs(d) * .45);
+    });
+    [...dots.children].forEach((d, i) => d.classList.toggle('on', i === best));
+  }
+  slider.addEventListener('scroll', coverflow, { passive: true });
+  addEventListener('resize', coverflow);
+  coverflow();
+
+  // Finger/mouse tilt + idle float on each card
+  slides.forEach((s, i) => {
+    const card = s.querySelector('.card'), inner = s.querySelector('.card-inner');
+    let touching = false;
+    const tilt = (x, y) => {
+      const r = inner.getBoundingClientRect();
+      const nx = clamp((x - r.left) / r.width), ny = clamp((y - r.top) / r.height);
+      card.style.setProperty('--ry', ((nx - .5) * 24).toFixed(2) + 'deg');
+      card.style.setProperty('--rx', ((.5 - ny) * 20).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (nx * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (ny * 100).toFixed(1) + '%');
+    };
+    card.addEventListener('pointermove', e => { touching = true; tilt(e.clientX, e.clientY); });
+    card.addEventListener('pointerleave', () => { touching = false; });
+    card.addEventListener('touchend', () => { touching = false; });
+    if (!reduce) {
+      let ph = i * 1.7;
+      setInterval(() => {
+        if (touching) return;
+        ph += .05;
+        card.style.setProperty('--ry', (Math.sin(ph) * 9).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (Math.cos(ph * .8) * 6).toFixed(2) + 'deg');
+        card.style.setProperty('--mx', (50 + Math.sin(ph) * 45).toFixed(1) + '%');
+      }, 60);
+    }
+  });
+
+  /* =================== COPY =================== */
+  const toast = document.getElementById('toast'), toastText = document.getElementById('toastText');
+  let toastTimer;
+  function showToast(msg) {
+    toastText.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+  async function copy(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+      let ok = false; try { ok = document.execCommand('copy'); } catch {}
+      ta.remove(); return ok;
+    }
+  }
+  async function handle(el) {
+    const ok = await copy(el.dataset.copy);
+    showToast(ok ? `${el.dataset.label} copied · คัดลอกแล้ว` : 'Copy failed — long-press to copy');
+    if (navigator.vibrate) navigator.vibrate(18);
+    const host = el.closest('.phone') || el;
+    host.classList.add(host.classList.contains('btn') ? 'ok' : 'copied');
+    setTimeout(() => host.classList.remove('ok', 'copied'), 1400);
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-copy]');
+    if (el) handle(el);
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.card[data-copy]')) { e.preventDefault(); handle(e.target); }
+  });
+
+  /* =================== REVEAL =================== */
+  const io = new IntersectionObserver(es => es.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  }), { threshold: .12 });
+  document.querySelectorAll('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 3) * 80 + 'ms'; io.observe(el); });
+})();
+</script>
+</body>
+</html>
