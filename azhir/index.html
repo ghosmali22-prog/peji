@@ -201,6 +201,7 @@
     font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
     border: 0; border-radius: 999px; padding: 9px 16px; cursor: pointer;
     background: #3a3a3c; color: var(--op);
+    min-width: 76px;
   }
   .plan.best button { background: var(--op); color: #000; }
   .plan button:disabled { opacity: .55; cursor: progress; }
@@ -272,27 +273,27 @@
           <h2 id="sheetTitle">برای قطع آژیر، اشتراک بخرید</h2>
           <button type="button" class="close" id="closeSheet" aria-label="بستن">✕</button>
         </div>
-        <p class="lead">قطع آژیر یک قابلیت ویژه است. با اشتراک ماهانه، در سکوت کامل حساب کنید.</p>
+        <p class="lead">آژیر فقط با اشتراک قطع می‌شود.</p>
 
         <div class="plans">
           <article class="plan">
             <h3>برنزی</h3>
-            <p>آژیر فقط کمی آرام‌تر می‌شود · ۴۹٬۰۰۰ تومان در ماه</p>
-            <button type="button" data-plan="bronze">خرید</button>
+            <p>آژیر کمی آرام‌تر می‌شود</p>
+            <button type="button" data-plan="bronze"><bdi dir="ltr">۱٫۹۹$</bdi></button>
           </article>
           <article class="plan best">
             <h3>طلایی <em>پیشنهادی</em></h3>
-            <p>قطع کامل آژیر تا ۳۰ روز · ۹۹٬۰۰۰ تومان در ماه</p>
-            <button type="button" data-plan="gold">خرید</button>
+            <p>آژیر کامل قطع می‌شود</p>
+            <button type="button" data-plan="gold"><bdi dir="ltr">۴٫۹۹$</bdi></button>
           </article>
           <article class="plan">
             <h3>الماسی</h3>
-            <p>قطع آژیر و اعلام جواب با احترام · ۴۹۹٬۰۰۰ تومان در ماه</p>
-            <button type="button" data-plan="vip">خرید</button>
+            <p>قطع آژیر و جواب با احترام</p>
+            <button type="button" data-plan="vip"><bdi dir="ltr">۹٫۹۹$</bdi></button>
           </article>
         </div>
 
-        <p class="fine">تمدید خودکار ماهانه. لغو اشتراک فقط با خرید اشتراک بالاتر ممکن است.</p>
+        <p class="fine">قیمت‌ها ماهانه است و هر ماه خودکار تمدید می‌شود.</p>
       </section>
     </div>
 
@@ -540,12 +541,12 @@
     const b = e.target.closest('button[data-plan]');
     if (!b) return;
     const choice = b.dataset.plan;
-    const label = b.textContent;
+    const label = b.innerHTML;
     veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = true; });
     b.textContent = '…';
     setTimeout(() => {
       veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = false; });
-      b.textContent = label;
+      b.innerHTML = label;
       if (choice === 'bronze') {
         setVolume(volume * 0.7);
         toast('اشتراک برنزی فعال شد. آژیر فقط کمی آرام‌تر شد؛ برای قطع کامل، طلایی بخرید.');
