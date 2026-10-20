@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ماشین‌حساب آژیری</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;600;800&display=swap">
+<style>
+  /* Layout: one centered calculator body with a police light bar on top; a bottom sheet of subscription plans slides over it. Single dark world on purpose. */
+  :root {
+    --ground: #0d0f17;        /* night street */
+    --body: #1b1f2c;          /* calculator shell */
+    --key: #272c3d;
+    --key-op: #353c55;
+    --fg: #eef0f7;
+    --muted: #8d93a8;
+    --lcd: #c9e8b0;           /* old LCD green */
+    --lcd-ink: #1d2a14;
+    --red: #ff3b47;
+    --blue: #3b7bff;
+    --gold: #f5c542;
+    --font-display: "Lalezar", "Vazirmatn", Tahoma, sans-serif;
+    --font-body: "Vazirmatn", Tahoma, system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--ground); color: var(--fg);
+    font-family: var(--font-body);
+    display: grid; place-items: center;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .15s;
+  }
+  body.alarm { animation: strobe .5s steps(1) infinite; }
+  @keyframes strobe { 0% { background: #3a0910; } 50% { background: #0a1640; } }
+
+  .calc {
+    width: 100%; max-width: 360px;
+    background: var(--body);
+    border-radius: 28px;
+    padding: 18px;
+    display: grid; gap: 14px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+    position: relative;
+  }
+
+  /* Light bar */
+  .lightbar {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    height: 22px; margin-inline: 30px;
+  }
+  .lightbar span {
+    border-radius: 11px 11px 4px 4px;
+    opacity: .25; transition: opacity .1s, box-shadow .1s;
+  }
+  .lightbar .r { background: var(--red); }
+  .lightbar .b { background: var(--blue); }
+  body.alarm .lightbar .r { animation: blinkR .5s steps(1) infinite; }
+  body.alarm .lightbar .b { animation: blinkB .5s steps(1) infinite; }
+  @keyframes blinkR { 0% { opacity: 1; box-shadow: 0 0 30px 8px var(--red); } 50% { opacity: .25; box-shadow: none; } }
+  @keyframes blinkB { 0% { opacity: .25; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 30px 8px var(--blue); } }
+
+  .brand {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--muted); letter-spacing: .02em;
+  }
+  .brand b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--fg); }
+  .sub-chip {
+    font-size: 11px; padding: 3px 9px; border-radius: 999px;
+    background: rgba(245,197,66,.15); color: var(--gold);
+    display: inline-flex; gap: 6px; align-items: center;
+  }
+  .sub-chip button { all: unset; cursor: pointer; text-decoration: underline; opacity: .8; }
+
+  .lcd {
+    background: var(--lcd); color: var(--lcd-ink);
+    border-radius: 14px; padding: 12px 16px;
+    min-height: 104px;
+    display: grid; align-content: end; gap: 4px;
+    direction: ltr; text-align: right;
+    box-shadow: inset 0 3px 10px rgba(0,0,0,.25);
+    overflow: hidden;
+  }
+  .lcd .expr { font-size: 15px; opacity: .6; min-height: 1.4em; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .lcd .val { font-size: 40px; font-weight: 800; line-height: 1.1; white-space: nowrap; overflow-x: auto; scrollbar-width: none; font-variant-numeric: tabular-nums; }
+  .lcd .val.small { font-size: 26px; }
+  .lcd .val.polite { font-size: 20px; font-weight: 600; direction: rtl; text-align: right; white-space: normal; }
+
+  .stop {
+    font: inherit; font-weight: 800; font-size: 16px;
+    border: 0; border-radius: 14px; padding: 14px;
+    background: var(--red); color: #fff; cursor: pointer;
+    animation: pulse .6s ease-in-out infinite alternate;
+  }
+  @keyframes pulse { to { transform: scale(1.03); box-shadow: 0 0 24px rgba(255,59,71,.6); } }
+
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; direction: ltr; }
+  .keys button {
+    font: inherit; font-size: 22px; font-weight: 600;
+    aspect-ratio: 1 / 1; max-width: 100%;
+    border: 0; border-radius: 18px;
+    background: var(--key); color: var(--fg);
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.35);
+    transition: transform .05s, filter .1s;
+  }
+  .keys button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35); }
+  .keys button:hover { filter: brightness(1.15); }
+  .keys button:focus-visible, .stop:focus-visible, .plan button:focus-visible, .sheet .x:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .keys .op { background: var(--key-op); color: #b9c6ff; }
+  .keys .fn { color: var(--muted); font-size: 18px; }
+  .keys .eq { background: var(--red); color: #fff; grid-row: span 2; aspect-ratio: auto; }
+  .keys .zero { grid-column: span 2; aspect-ratio: auto; }
+
+  .hint { text-align: center; font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* Subscription sheet */
+  .veil {
+    position: fixed; inset: 0; z-index: 20;
+    background: rgba(5,6,12,.7);
+    display: grid; align-items: end; justify-items: center;
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-top: 40px;
+  }
+  .sheet {
+    width: 100%; max-width: 560px; max-height: 100%; overflow-y: auto;
+    background: #f7f5ef; color: #1a1c24;
+    border-radius: 24px 24px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+    display: grid; gap: 16px;
+    position: relative;
+    animation: up .3s ease-out;
+  }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .sheet h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; margin: 0; text-wrap: balance; }
+  .sheet .lead { margin: 0; color: #5a5f70; line-height: 1.8; font-size: 14px; }
+  .sheet .x {
+    position: absolute; top: 14px; left: 14px;
+    width: 34px; height: 34px; border-radius: 50%; border: 0;
+    background: #e6e3da; color: #1a1c24; font-size: 20px; cursor: pointer;
+  }
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 520px) { .plans { grid-template-columns: 1fr; } }
+  .plan {
+    border: 1.5px solid #dcd8cc; border-radius: 16px; padding: 14px;
+    display: grid; gap: 8px; align-content: start; background: #fff;
+    min-width: 0;
+  }
+  .plan.best { border-color: var(--gold); box-shadow: 0 6px 20px rgba(245,197,66,.3); }
+  .plan .tag { font-size: 11px; font-weight: 800; color: #9a6b00; background: #fff1c7; border-radius: 999px; padding: 2px 8px; justify-self: start; }
+  .plan h3 { margin: 0; font-size: 17px; }
+  .plan .price { font-size: 22px; font-weight: 800; }
+  .plan .price small { font-size: 12px; font-weight: 400; color: #5a5f70; }
+  .plan ul { margin: 0; padding-inline-start: 18px; font-size: 13px; line-height: 1.8; color: #3d4150; }
+  .plan button {
+    font: inherit; font-weight: 800; font-size: 14px;
+    border: 0; border-radius: 12px; padding: 11px; cursor: pointer;
+    background: #1a1c24; color: #fff;
+  }
+  .plan.best button { background: var(--gold); color: #1a1c24; }
+  .plan button:disabled { opacity: .6; cursor: progress; }
+  .fine { font-size: 11px; color: #8a8e9c; margin: 0; text-align: center; }
+
+  .toast {
+    position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    max-width: min(420px, calc(100% - 32px));
+    background: #1a1c24; color: #fff; border: 1px solid #353c55;
+    border-radius: 14px; padding: 12px 16px; font-size: 14px; line-height: 1.7;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.alarm { animation: none; background: #2a0b12; }
+    body.alarm .lightbar .r, body.alarm .lightbar .b { animation: none; opacity: 1; }
+    .stop, .sheet { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="calc" aria-label="ماشین‌حساب">
+  <div class="lightbar" aria-hidden="true"><span class="r"></span><span class="b"></span></div>
+  <div class="brand">
+    <b>ماشین‌حساب آژیری</b>
+    <span class="sub-chip" id="subChip" hidden><span id="subLabel">اشتراک فعال</span><button type="button" id="cancelSub">لغو</button></span>
+  </div>
+
+  <div class="lcd" role="status" aria-live="polite">
+    <div class="expr" id="expr"></div>
+    <div class="val" id="val">۰</div>
+  </div>
+
+  <button type="button" class="stop" id="stopBtn" hidden>توقف آژیر</button>
+
+  <div class="keys" id="keys">
+    <button type="button" class="fn" data-k="C">C</button>
+    <button type="button" class="fn" data-k="back" aria-label="پاک کردن آخرین رقم">⌫</button>
+    <button type="button" class="fn" data-k="%">%</button>
+    <button type="button" class="op" data-k="/" aria-label="تقسیم">÷</button>
+
+    <button type="button" data-k="7">۷</button>
+    <button type="button" data-k="8">۸</button>
+    <button type="button" data-k="9">۹</button>
+    <button type="button" class="op" data-k="*" aria-label="ضرب">×</button>
+
+    <button type="button" data-k="4">۴</button>
+    <button type="button" data-k="5">۵</button>
+    <button type="button" data-k="6">۶</button>
+    <button type="button" class="op" data-k="-" aria-label="منها">−</button>
+
+    <button type="button" data-k="1">۱</button>
+    <button type="button" data-k="2">۲</button>
+    <button type="button" data-k="3">۳</button>
+    <button type="button" class="op" data-k="+" aria-label="به علاوه">+</button>
+
+    <button type="button" class="zero" data-k="0">۰</button>
+    <button type="button" data-k=".">٫</button>
+    <button type="button" class="eq" data-k="=" aria-label="مساوی">=</button>
+  </div>
+
+  <p class="hint">صدای دستگاه را زیاد کنید و یک حساب ساده انجام دهید.</p>
+</main>
+
+<div class="veil" id="veil" hidden>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button type="button" class="x" id="closeSheet" aria-label="بستن">×</button>
+    <h2 id="sheetTitle">برای قطع آژیر، اشتراک بخرید</h2>
+    <p class="lead">قطع آژیر یک قابلیت ویژه است. با خرید اشتراک ماهانه، هر چقدر دلتان بخواهد حساب کنید و آژیر هم ساکت بماند.</p>
+
+    <div class="plans">
+      <article class="plan">
+        <h3>برنزی</h3>
+        <div class="price">۴۹٬۰۰۰ <small>تومان / ماه</small></div>
+        <ul>
+          <li>آژیر فقط کمی آرام‌تر می‌شود</li>
+          <li>چراغ‌ها همچنان چشمک می‌زنند</li>
+        </ul>
+        <button type="button" data-plan="bronze">خرید اشتراک برنزی</button>
+      </article>
+
+      <article class="plan best">
+        <span class="tag">پیشنهاد ویژه</span>
+        <h3>طلایی</h3>
+        <div class="price">۹۹٬۰۰۰ <small>تومان / ماه</small></div>
+        <ul>
+          <li>قطع کامل آژیر تا ۳۰ روز</li>
+          <li>حساب‌وکتاب در سکوت کامل</li>
+        </ul>
+        <button type="button" data-plan="gold">خرید اشتراک طلایی</button>
+      </article>
+
+      <article class="plan">
+        <h3>الماسی</h3>
+        <div class="price">۴۹۹٬۰۰۰ <small>تومان / ماه</small></div>
+        <ul>
+          <li>همه امکانات طلایی</li>
+          <li>ماشین‌حساب جواب را با احترام اعلام می‌کند</li>
+        </ul>
+        <button type="button" data-plan="vip">خرید اشتراک الماسی</button>
+      </article>
+    </div>
+
+    <p class="fine">تمدید خودکار ماهانه. لغو اشتراک فقط با خرید اشتراک بالاتر امکان‌پذیر است.</p>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const exprEl = $('expr'), valEl = $('val'), stopBtn = $('stopBtn');
+  const veil = $('veil'), toastEl = $('toast');
+  const subChip = $('subChip'), subLabel = $('subLabel');
+
+  const FA = '۰۱۲۳۴۵۶۷۸۹';
+  const toFa = (s) => String(s).replace(/[0-9]/g, (d) => FA[d]).replace(/\./g, '٫');
+  const OPS = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  // ---------- calculator state ----------
+  let tokens = [];      // numbers (as strings) and operators
+  let cur = '0';        // number being typed
+  let justEvaluated = false;
+  let plan = null;      // null | 'gold' | 'vip'
+
+  function render(resultText) {
+    exprEl.textContent = tokens.map((t) => OPS[t] || toFa(t)).join(' ');
+    valEl.classList.remove('polite', 'small');
+    if (resultText !== undefined) {
+      valEl.textContent = resultText;
+      if (plan === 'vip') valEl.classList.add('polite');
+    } else {
+      valEl.textContent = toFa(cur);
+    }
+    if (valEl.textContent.length > 11 && !valEl.classList.contains('polite')) valEl.classList.add('small');
+  }
+
+  function evaluate(list) {
+    // two passes: × ÷ first, then + −
+    const nums = [parseFloat(list[0])], ops = [];
+    for (let i = 1; i < list.length; i += 2) {
+      const op = list[i], n = parseFloat(list[i + 1]);
+      if (op === '*' || op === '/') {
+        const a = nums.pop();
+        if (op === '/' && n === 0) return NaN;
+        nums.push(op === '*' ? a * n : a / n);
+      } else { ops.push(op); nums.push(n); }
+    }
+    let r = nums[0];
+    ops.forEach((op, i) => { r = op === '+' ? r + nums[i + 1] : r - nums[i + 1]; });
+    return r;
+  }
+
+  function fmt(n) {
+    const clean = parseFloat(n.toPrecision(12));
+    return clean.toLocaleString('fa-IR', { maximumFractionDigits: 10 });
+  }
+
+  function press(k) {
+    ensureAudio();
+    if (/^[0-9]$/.test(k)) {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      cur = cur === '0' ? k : (cur === '-0' ? '-' + k : cur + k);
+      if (cur.replace(/[-.]/g, '').length > 15) cur = cur.slice(0, -1);
+    } else if (k === '.') {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      if (!cur.includes('.')) cur += '.';
+    } else if (k in OPS) {
+      justEvaluated = false;
+      if (cur === '' && tokens.length) tokens[tokens.length - 1] = k;
+      else { tokens.push(cur.replace(/\.$/, '')); tokens.push(k); }
+      cur = '';
+      render(); valEl.textContent = toFa(tokens[tokens.length - 2] ?? '0'); return;
+    } else if (k === 'C') {
+      tokens = []; cur = '0'; justEvaluated = false;
+    } else if (k === 'back') {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      else cur = cur.length > 1 ? cur.slice(0, -1) : '0';
+      if (cur === '-') cur = '0';
+    } else if (k === '%') {
+      if (cur && cur !== '0') cur = String(parseFloat((parseFloat(cur) / 100).toPrecision(12)));
+    } else if (k === '=') {
+      if (justEvaluated) return;
+      if (cur === '' && tokens.length) tokens.pop();
+      else tokens.push(cur.replace(/\.$/, ''));
+      if (tokens.length < 3) { cur = tokens[0] || '0'; tokens = []; render(); return; }
+      const r = evaluate(tokens);
+      exprEl.textContent = tokens.map((t) => OPS[t] || toFa(t)).join(' ') + ' =';
+      tokens = [];
+      justEvaluated = true;
+      if (!isFinite(r)) { cur = '0'; showResult('خطا'); return; }
+      cur = String(parseFloat(r.toPrecision(12)));
+      showResult(fmt(r));
+      triggerSiren();
+      return;
+    }
+    render();
+  }
+
+  function showResult(text) {
+    const expr = exprEl.textContent;
+    render(plan === 'vip' && text !== 'خطا' ? `قربان، با کمال احترام جواب ${text} است.` : text);
+    exprEl.textContent = expr;
+  }
+
+  document.getElementById('keys').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-k]');
+    if (b) press(b.dataset.k);
+  });
+
+  const KEYMAP = { Enter: '=', '=': '=', Backspace: 'back', Escape: 'C', Delete: 'C', ',': '.', 'x': '*', 'X': '*' };
+  document.addEventListener('keydown', (e) => {
+    if (!veil.hidden) { if (e.key === 'Escape') closeSheet(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    let k = KEYMAP[e.key] || e.key;
+    const fa = FA.indexOf(k); if (fa >= 0) k = String(fa);
+    if (/^[0-9]$/.test(k) || k in OPS || ['.', '=', 'C', 'back', '%'].includes(k)) {
+      e.preventDefault(); press(k);
+    }
+  });
+
+  // ---------- siren ----------
+  let ctx = null, master = null, sirenNodes = null, volume = 0.22, sirenOn = false;
+
+  function ensureAudio() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0;
+    const comp = ctx.createDynamicsCompressor();
+    master.connect(comp); comp.connect(ctx.destination);
+  }
+
+  function startSound() {
+    if (!ctx || sirenNodes) return;
+    // classic wail: a tone swept up and down by a slow LFO
+    const osc = ctx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = 1000;
+    const osc2 = ctx.createOscillator(); osc2.type = 'square'; osc2.frequency.value = 1003;
+    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.55;
+    const depth = ctx.createGain(); depth.gain.value = 420;
+    lfo.connect(depth); depth.connect(osc.frequency); depth.connect(osc2.frequency);
+    const tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 3200;
+    const mix2 = ctx.createGain(); mix2.gain.value = 0.35;
+    osc.connect(tone); osc2.connect(mix2); mix2.connect(tone); tone.connect(master);
+    [osc, osc2, lfo].forEach((n) => n.start());
+    sirenNodes = [osc, osc2, lfo];
+    master.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
+  }
+
+  function stopSound() {
+    if (!sirenNodes) return;
+    const nodes = sirenNodes; sirenNodes = null;
+    master.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+    setTimeout(() => nodes.forEach((n) => { try { n.stop(); } catch (_) {} }), 300);
+  }
+
+  function setVolume(v) {
+    volume = Math.max(0.03, Math.min(0.6, v));
+    if (sirenNodes) master.gain.setTargetAtTime(volume, ctx.currentTime, 0.1);
+  }
+
+  let buzz = null;
+  function triggerSiren() {
+    if (plan) return;
+    if (sirenOn) return;
+    sirenOn = true;
+    document.body.classList.add('alarm');
+    stopBtn.hidden = false;
+    startSound();
+    if (navigator.vibrate) {
+      try { navigator.vibrate([400, 200, 400]); buzz = setInterval(() => navigator.vibrate([400, 200, 400]), 1200); } catch (_) {}
+    }
+  }
+
+  function silence() {
+    sirenOn = false;
+    document.body.classList.remove('alarm');
+    stopBtn.hidden = true;
+    stopSound();
+    clearInterval(buzz); try { navigator.vibrate && navigator.vibrate(0); } catch (_) {}
+  }
+
+  // ---------- subscription sheet ----------
+  let toastTimer = null;
+  function toast(msg, ms = 4200) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, ms);
+  }
+
+  stopBtn.addEventListener('click', () => {
+    veil.hidden = false;
+    veil.querySelector('.plan.best button').focus();
+  });
+
+  function closeSheet() {
+    veil.hidden = true;
+    if (sirenOn) {
+      setVolume(volume * 1.4);
+      toast('بدون اشتراک، آژیر قطع نمی‌شود. تازه بلندتر هم شد.');
+    }
+    stopBtn.focus();
+  }
+  $('closeSheet').addEventListener('click', closeSheet);
+  veil.addEventListener('click', (e) => { if (e.target === veil) closeSheet(); });
+
+  veil.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-plan]');
+    if (!b) return;
+    const choice = b.dataset.plan;
+    const label = b.textContent;
+    veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = true; });
+    b.textContent = 'در حال فعال‌سازی…';
+    setTimeout(() => {
+      veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = false; });
+      b.textContent = label;
+      if (choice === 'bronze') {
+        setVolume(volume * 0.6);
+        toast('اشتراک برنزی فعال شد. آژیر فقط کمی آرام‌تر شد؛ برای قطع کامل، طلایی بخرید.');
+        return;
+      }
+      plan = choice;
+      veil.hidden = true;
+      silence();
+      subLabel.textContent = choice === 'vip' ? 'اشتراک الماسی فعال' : 'اشتراک طلایی فعال';
+      subChip.hidden = false;
+      toast('اشتراک فعال شد و آژیر قطع شد. شوخی بود؛ هیچ پولی پرداخت نشد!', 5500);
+    }, 1400);
+  });
+
+  $('cancelSub').addEventListener('click', () => {
+    plan = null; subChip.hidden = true;
+    toast('اشتراک لغو شد. آژیر برگشت سر کارش.');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
