@@ -2,282 +2,309 @@
 <html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ماشین‌حساب آژیری</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;300;400;500;600;700&display=swap">
 <style>
-  /* Layout: one centered calculator body with a police light bar on top; a bottom sheet of subscription plans slides over it. Single dark world on purpose. */
+  /* Layout: an iPhone-style calculator; on wide screens it sits inside a titanium phone body, on phones it fills the screen. Sheets and banners live inside the screen. Single dark world on purpose. */
   :root {
-    --ground: #0d0f17;        /* night street */
-    --body: #1b1f2c;          /* calculator shell */
-    --key: #272c3d;
-    --key-op: #353c55;
-    --fg: #eef0f7;
-    --muted: #8d93a8;
-    --lcd: #c9e8b0;           /* old LCD green */
-    --lcd-ink: #1d2a14;
-    --red: #ff3b47;
-    --blue: #3b7bff;
-    --gold: #f5c542;
-    --font-display: "Lalezar", "Vazirmatn", Tahoma, sans-serif;
-    --font-body: "Vazirmatn", Tahoma, system-ui, sans-serif;
+    --ground: #050506;
+    --screen: #000;
+    --fg: #fff;
+    --muted: #8e8e93;
+    --key: #333335;
+    --key-hi: #3f3f42;
+    --fn: #a5a5a5;
+    --fn-hi: #d4d4d2;
+    --op: #ff9f0a;
+    --op-hi: #ffb340;
+    --alarm: #ff1f2d;
+    --sheet: #1c1c1e;
+    --row: #2c2c2e;
+    --font: "Vazirmatn", -apple-system, "SF Pro Display", Tahoma, system-ui, sans-serif;
     color-scheme: dark;
   }
   [hidden] { display: none !important; }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background: var(--ground); color: var(--fg);
-    font-family: var(--font-body);
+    background: radial-gradient(120% 80% at 50% 0%, #17171b 0%, var(--ground) 60%);
+    background-color: var(--ground);
+    color: var(--fg); font-family: var(--font);
     display: grid; place-items: center;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
     padding-block: 24px;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color .15s;
-  }
-  body.alarm { animation: strobe .5s steps(1) infinite; }
-  @keyframes strobe { 0% { background: #3a0910; } 50% { background: #0a1640; } }
-
-  .calc {
-    width: 100%; max-width: 360px;
-    background: var(--body);
-    border-radius: 28px;
-    padding: 18px;
-    display: grid; gap: 14px;
-    box-shadow: 0 30px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
-    position: relative;
-  }
-
-  /* Light bar */
-  .lightbar {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-    height: 22px; margin-inline: 30px;
-  }
-  .lightbar span {
-    border-radius: 11px 11px 4px 4px;
-    opacity: .25; transition: opacity .1s, box-shadow .1s;
-  }
-  .lightbar .r { background: var(--red); }
-  .lightbar .b { background: var(--blue); }
-  body.alarm .lightbar .r { animation: blinkR .5s steps(1) infinite; }
-  body.alarm .lightbar .b { animation: blinkB .5s steps(1) infinite; }
-  @keyframes blinkR { 0% { opacity: 1; box-shadow: 0 0 30px 8px var(--red); } 50% { opacity: .25; box-shadow: none; } }
-  @keyframes blinkB { 0% { opacity: .25; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 30px 8px var(--blue); } }
-
-  .brand {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 12px; color: var(--muted); letter-spacing: .02em;
-  }
-  .brand b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--fg); }
-  .sub-chip {
-    font-size: 11px; padding: 3px 9px; border-radius: 999px;
-    background: rgba(245,197,66,.15); color: var(--gold);
-    display: inline-flex; gap: 6px; align-items: center;
-  }
-  .sub-chip button { all: unset; cursor: pointer; text-decoration: underline; opacity: .8; }
-
-  .lcd {
-    background: var(--lcd); color: var(--lcd-ink);
-    border-radius: 14px; padding: 12px 16px;
-    min-height: 104px;
-    display: grid; align-content: end; gap: 4px;
-    direction: ltr; text-align: right;
-    box-shadow: inset 0 3px 10px rgba(0,0,0,.25);
+    -webkit-user-select: none; user-select: none;
     overflow: hidden;
   }
-  .lcd .expr { font-size: 15px; opacity: .6; min-height: 1.4em; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
-  .lcd .val { font-size: 40px; font-weight: 800; line-height: 1.1; white-space: nowrap; overflow-x: auto; scrollbar-width: none; font-variant-numeric: tabular-nums; }
-  .lcd .val.small { font-size: 26px; }
-  .lcd .val.polite { font-size: 20px; font-weight: 600; direction: rtl; text-align: right; white-space: normal; }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(255,20,35,.55) 100%);
+  }
+  body.alarm::after { animation: flood .45s steps(1) infinite; }
+  @keyframes flood { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Phone body (wide screens) */
+  .phone {
+    width: min(392px, 100%);
+    height: min(848px, calc(100vh - 48px));
+    height: min(848px, calc(100dvh - 48px));
+    border-radius: 60px;
+    padding: 11px;
+    background: linear-gradient(145deg, #6b6b70 0%, #2a2a2d 22%, #48484c 50%, #1d1d20 78%, #5d5d62 100%);
+    box-shadow:
+      0 50px 90px -20px rgba(0,0,0,.9),
+      0 30px 40px -30px rgba(0,0,0,.8),
+      inset 0 0 0 1px rgba(255,255,255,.18),
+      inset 0 0 0 3px #0c0c0d;
+    transform: perspective(1600px) rotateX(4deg);
+    transform-origin: 50% 100%;
+    position: relative;
+  }
+  .screen {
+    position: relative; height: 100%;
+    background: var(--screen);
+    border-radius: 50px; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 60px 20px 34px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .island {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 35px; border-radius: 20px; background: #000;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    z-index: 40;
+  }
+  .screen::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(130% 70% at 50% 0%, rgba(255,30,45,.75), transparent 70%);
+  }
+  body.alarm .screen::after { animation: flood .45s steps(1) infinite; }
+
+  @media (max-width: 520px), (max-height: 640px) {
+    body { padding: 0; background: var(--screen); }
+    .phone { width: 100%; height: 100%; border-radius: 0; padding: 0; background: none; box-shadow: none; transform: none; }
+    .screen {
+      border-radius: 0;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    }
+    .island { display: none; }
+  }
+
+  .status {
+    position: absolute; top: 58px; right: 24px; left: 24px;
+    display: flex; justify-content: flex-start;
+    font-size: 12px; color: var(--muted);
+  }
+  @media (max-width: 520px), (max-height: 640px) { .status { top: calc(14px + env(safe-area-inset-top, 0px)); } }
+  .status button { all: unset; cursor: pointer; color: var(--op); margin-inline-start: 6px; }
+
+  .display {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch;
+    padding: 0 8px 14px; gap: 2px;
+    direction: ltr; text-align: right;
+  }
+  .expr, .val { unicode-bidi: bidi-override; }
+  .expr { font-size: 22px; font-weight: 300; color: var(--muted); min-height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .val {
+    font-size: 84px; font-weight: 200; line-height: 1.05; letter-spacing: -.01em;
+    white-space: nowrap; overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    transition: color .2s;
+  }
+  .val.m { font-size: 64px; } .val.s { font-size: 48px; } .val.xs { font-size: 36px; }
+  .val.polite { font-size: 28px; font-weight: 300; direction: rtl; unicode-bidi: plaintext; text-align: right; white-space: normal; line-height: 1.6; }
+  body.alarm .val { color: #ffd9dc; text-shadow: 0 0 24px rgba(255,40,55,.7); }
 
   .stop {
-    font: inherit; font-weight: 800; font-size: 16px;
-    border: 0; border-radius: 14px; padding: 14px;
-    background: var(--red); color: #fff; cursor: pointer;
-    animation: pulse .6s ease-in-out infinite alternate;
+    font: inherit; font-size: 17px; font-weight: 600;
+    margin: 0 4px 16px; padding: 15px;
+    border: 0; border-radius: 999px; cursor: pointer;
+    color: #fff;
+    background: linear-gradient(180deg, #ff4b55, #d70015);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 10px 30px rgba(255,20,40,.55);
   }
-  @keyframes pulse { to { transform: scale(1.03); box-shadow: 0 0 24px rgba(255,59,71,.6); } }
+  .stop:active { transform: scale(.98); }
 
-  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; direction: ltr; }
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; direction: ltr; }
   .keys button {
-    font: inherit; font-size: 22px; font-weight: 600;
+    font: inherit; font-size: 34px; font-weight: 400; color: var(--fg);
     aspect-ratio: 1 / 1; max-width: 100%;
-    border: 0; border-radius: 18px;
-    background: var(--key); color: var(--fg);
-    cursor: pointer;
-    box-shadow: 0 3px 0 rgba(0,0,0,.35);
-    transition: transform .05s, filter .1s;
+    border: 0; border-radius: 999px; cursor: pointer;
+    background: linear-gradient(180deg, var(--key-hi) 0%, var(--key) 55%, #2a2a2c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.16),
+      inset 0 -3px 6px rgba(0,0,0,.35),
+      0 8px 16px -6px rgba(0,0,0,.9),
+      0 2px 3px rgba(0,0,0,.6);
+    transition: transform .08s ease, filter .25s ease, box-shadow .08s ease;
+    display: grid; place-items: center;
   }
-  .keys button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35); }
-  .keys button:hover { filter: brightness(1.15); }
-  .keys button:focus-visible, .stop:focus-visible, .plan button:focus-visible, .sheet .x:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
-  .keys .op { background: var(--key-op); color: #b9c6ff; }
-  .keys .fn { color: var(--muted); font-size: 18px; }
-  .keys .eq { background: var(--red); color: #fff; grid-row: span 2; aspect-ratio: auto; }
-  .keys .zero { grid-column: span 2; aspect-ratio: auto; }
+  .keys button:active {
+    transform: translateY(1px) scale(.96);
+    filter: brightness(1.45);
+    transition-duration: 0s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 -1px 3px rgba(0,0,0,.3), 0 3px 6px -3px rgba(0,0,0,.9);
+  }
+  .keys .fn { background: linear-gradient(180deg, var(--fn-hi) 0%, var(--fn) 70%, #969696 100%); color: #000; font-size: 28px; font-weight: 500; }
+  .keys .op { background: linear-gradient(180deg, var(--op-hi) 0%, var(--op) 60%, #f08c00 100%); font-size: 38px; }
+  .keys .op.on { background: #fff; color: var(--op); }
+  .keys .zero { grid-column: span 2; aspect-ratio: auto; justify-items: start; padding-inline: 32px 0; }
+  .keys button:focus-visible, .stop:focus-visible, .plan button:focus-visible, .close:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
-  .hint { text-align: center; font-size: 12px; color: var(--muted); margin: 0; }
-
-  /* Subscription sheet */
+  /* Subscription sheet, iOS style */
   .veil {
-    position: fixed; inset: 0; z-index: 20;
-    background: rgba(5,6,12,.7);
-    display: grid; align-items: end; justify-items: center;
-    padding-left: max(12px, env(safe-area-inset-left, 0px));
-    padding-right: max(12px, env(safe-area-inset-right, 0px));
-    padding-top: 40px;
+    position: absolute; inset: 0; z-index: 30;
+    background: rgba(0,0,0,.45);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+    display: flex; align-items: flex-end;
+    animation: fade .25s ease-out;
   }
+  @keyframes fade { from { opacity: 0; } }
   .sheet {
-    width: 100%; max-width: 560px; max-height: 100%; overflow-y: auto;
-    background: #f7f5ef; color: #1a1c24;
-    border-radius: 24px 24px 0 0;
-    padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
-    display: grid; gap: 16px;
-    position: relative;
-    animation: up .3s ease-out;
+    width: 100%; max-height: calc(100% - 40px); overflow-y: auto;
+    background: var(--sheet);
+    border-radius: 28px 28px 0 0;
+    padding: 10px 18px calc(26px + env(safe-area-inset-bottom, 0px));
+    display: grid; gap: 14px;
+    animation: rise .35s cubic-bezier(.2,.9,.25,1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,.6);
   }
-  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
-  .sheet h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; margin: 0; text-wrap: balance; }
-  .sheet .lead { margin: 0; color: #5a5f70; line-height: 1.8; font-size: 14px; }
-  .sheet .x {
-    position: absolute; top: 14px; left: 14px;
-    width: 34px; height: 34px; border-radius: 50%; border: 0;
-    background: #e6e3da; color: #1a1c24; font-size: 20px; cursor: pointer;
+  @keyframes rise { from { transform: translateY(100%); } }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: #48484a; justify-self: center; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .sheet h2 { margin: 0; font-size: 21px; font-weight: 700; text-wrap: balance; }
+  .close {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer;
+    background: #3a3a3c; color: #aeaeb2; font: inherit; font-size: 15px; font-weight: 700;
   }
-  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  @media (max-width: 520px) { .plans { grid-template-columns: 1fr; } }
+  .lead { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+  .plans { display: grid; gap: 10px; }
   .plan {
-    border: 1.5px solid #dcd8cc; border-radius: 16px; padding: 14px;
-    display: grid; gap: 8px; align-content: start; background: #fff;
-    min-width: 0;
+    background: var(--row); border-radius: 18px; padding: 14px 16px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
   }
-  .plan.best { border-color: var(--gold); box-shadow: 0 6px 20px rgba(245,197,66,.3); }
-  .plan .tag { font-size: 11px; font-weight: 800; color: #9a6b00; background: #fff1c7; border-radius: 999px; padding: 2px 8px; justify-self: start; }
-  .plan h3 { margin: 0; font-size: 17px; }
-  .plan .price { font-size: 22px; font-weight: 800; }
-  .plan .price small { font-size: 12px; font-weight: 400; color: #5a5f70; }
-  .plan ul { margin: 0; padding-inline-start: 18px; font-size: 13px; line-height: 1.8; color: #3d4150; }
+  .plan.best { box-shadow: inset 0 0 0 1.5px var(--op); }
+  .plan h3 { margin: 0; font-size: 16px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .plan h3 em { font-style: normal; font-size: 11px; font-weight: 600; color: #000; background: var(--op); border-radius: 999px; padding: 1px 8px; }
+  .plan p { margin: 0; grid-column: 1; font-size: 13px; color: var(--muted); line-height: 1.6; }
   .plan button {
-    font: inherit; font-weight: 800; font-size: 14px;
-    border: 0; border-radius: 12px; padding: 11px; cursor: pointer;
-    background: #1a1c24; color: #fff;
+    grid-row: 1 / span 2; grid-column: 2;
+    font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
+    border: 0; border-radius: 999px; padding: 9px 16px; cursor: pointer;
+    background: #3a3a3c; color: var(--op);
   }
-  .plan.best button { background: var(--gold); color: #1a1c24; }
-  .plan button:disabled { opacity: .6; cursor: progress; }
-  .fine { font-size: 11px; color: #8a8e9c; margin: 0; text-align: center; }
+  .plan.best button { background: var(--op); color: #000; }
+  .plan button:disabled { opacity: .55; cursor: progress; }
+  .fine { margin: 0; font-size: 11px; color: #636366; text-align: center; }
 
+  /* Banner, like a notification under the island */
   .toast {
-    position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    max-width: min(420px, calc(100% - 32px));
-    background: #1a1c24; color: #fff; border: 1px solid #353c55;
-    border-radius: 14px; padding: 12px 16px; font-size: 14px; line-height: 1.7;
-    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    position: absolute; z-index: 50; top: 56px; left: 14px; right: 14px;
+    background: rgba(44,44,46,.92);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-radius: 20px; padding: 13px 16px; font-size: 14px; line-height: 1.7;
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+    animation: drop .35s cubic-bezier(.2,.9,.25,1);
   }
+  @media (max-width: 520px), (max-height: 640px) { .toast { top: calc(10px + env(safe-area-inset-top, 0px)); } }
+  @keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
 
   @media (prefers-reduced-motion: reduce) {
-    body.alarm { animation: none; background: #2a0b12; }
-    body.alarm .lightbar .r, body.alarm .lightbar .b { animation: none; opacity: 1; }
-    .stop, .sheet { animation: none; }
+    body.alarm::after, body.alarm .screen::after { animation: none; opacity: .7; }
+    .phone { transform: none; }
+    .sheet, .veil, .toast { animation: none; }
   }
 </style>
 </head>
 <body>
 
-<main class="calc" aria-label="ماشین‌حساب">
-  <div class="lightbar" aria-hidden="true"><span class="r"></span><span class="b"></span></div>
-  <div class="brand">
-    <b>ماشین‌حساب آژیری</b>
-    <span class="sub-chip" id="subChip" hidden><span id="subLabel">اشتراک فعال</span><button type="button" id="cancelSub">لغو</button></span>
-  </div>
+<div class="phone">
+  <main class="screen" aria-label="ماشین‌حساب">
+    <div class="island" aria-hidden="true"></div>
+    <div class="status" id="subChip" hidden><span id="subLabel">اشتراک فعال</span><button type="button" id="cancelSub">لغو</button></div>
 
-  <div class="lcd" role="status" aria-live="polite">
-    <div class="expr" id="expr"></div>
-    <div class="val" id="val">۰</div>
-  </div>
-
-  <button type="button" class="stop" id="stopBtn" hidden>توقف آژیر</button>
-
-  <div class="keys" id="keys">
-    <button type="button" class="fn" data-k="C">C</button>
-    <button type="button" class="fn" data-k="back" aria-label="پاک کردن آخرین رقم">⌫</button>
-    <button type="button" class="fn" data-k="%">%</button>
-    <button type="button" class="op" data-k="/" aria-label="تقسیم">÷</button>
-
-    <button type="button" data-k="7">۷</button>
-    <button type="button" data-k="8">۸</button>
-    <button type="button" data-k="9">۹</button>
-    <button type="button" class="op" data-k="*" aria-label="ضرب">×</button>
-
-    <button type="button" data-k="4">۴</button>
-    <button type="button" data-k="5">۵</button>
-    <button type="button" data-k="6">۶</button>
-    <button type="button" class="op" data-k="-" aria-label="منها">−</button>
-
-    <button type="button" data-k="1">۱</button>
-    <button type="button" data-k="2">۲</button>
-    <button type="button" data-k="3">۳</button>
-    <button type="button" class="op" data-k="+" aria-label="به علاوه">+</button>
-
-    <button type="button" class="zero" data-k="0">۰</button>
-    <button type="button" data-k=".">٫</button>
-    <button type="button" class="eq" data-k="=" aria-label="مساوی">=</button>
-  </div>
-
-  <p class="hint">صدای دستگاه را زیاد کنید و یک حساب ساده انجام دهید.</p>
-</main>
-
-<div class="veil" id="veil" hidden>
-  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-    <button type="button" class="x" id="closeSheet" aria-label="بستن">×</button>
-    <h2 id="sheetTitle">برای قطع آژیر، اشتراک بخرید</h2>
-    <p class="lead">قطع آژیر یک قابلیت ویژه است. با خرید اشتراک ماهانه، هر چقدر دلتان بخواهد حساب کنید و آژیر هم ساکت بماند.</p>
-
-    <div class="plans">
-      <article class="plan">
-        <h3>برنزی</h3>
-        <div class="price">۴۹٬۰۰۰ <small>تومان / ماه</small></div>
-        <ul>
-          <li>آژیر فقط کمی آرام‌تر می‌شود</li>
-          <li>چراغ‌ها همچنان چشمک می‌زنند</li>
-        </ul>
-        <button type="button" data-plan="bronze">خرید اشتراک برنزی</button>
-      </article>
-
-      <article class="plan best">
-        <span class="tag">پیشنهاد ویژه</span>
-        <h3>طلایی</h3>
-        <div class="price">۹۹٬۰۰۰ <small>تومان / ماه</small></div>
-        <ul>
-          <li>قطع کامل آژیر تا ۳۰ روز</li>
-          <li>حساب‌وکتاب در سکوت کامل</li>
-        </ul>
-        <button type="button" data-plan="gold">خرید اشتراک طلایی</button>
-      </article>
-
-      <article class="plan">
-        <h3>الماسی</h3>
-        <div class="price">۴۹۹٬۰۰۰ <small>تومان / ماه</small></div>
-        <ul>
-          <li>همه امکانات طلایی</li>
-          <li>ماشین‌حساب جواب را با احترام اعلام می‌کند</li>
-        </ul>
-        <button type="button" data-plan="vip">خرید اشتراک الماسی</button>
-      </article>
+    <div class="display" role="status" aria-live="polite">
+      <div class="expr" id="expr"></div>
+      <div class="val" id="val">۰</div>
     </div>
 
-    <p class="fine">تمدید خودکار ماهانه. لغو اشتراک فقط با خرید اشتراک بالاتر امکان‌پذیر است.</p>
-  </section>
-</div>
+    <button type="button" class="stop" id="stopBtn" hidden>توقف آژیر</button>
 
-<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <div class="keys" id="keys">
+      <button type="button" class="fn" data-k="C" id="clearKey">AC</button>
+      <button type="button" class="fn" data-k="back" aria-label="پاک کردن آخرین رقم">⌫</button>
+      <button type="button" class="fn" data-k="%">%</button>
+      <button type="button" class="op" data-k="/" aria-label="تقسیم">÷</button>
+
+      <button type="button" data-k="7">۷</button>
+      <button type="button" data-k="8">۸</button>
+      <button type="button" data-k="9">۹</button>
+      <button type="button" class="op" data-k="*" aria-label="ضرب">×</button>
+
+      <button type="button" data-k="4">۴</button>
+      <button type="button" data-k="5">۵</button>
+      <button type="button" data-k="6">۶</button>
+      <button type="button" class="op" data-k="-" aria-label="منها">−</button>
+
+      <button type="button" data-k="1">۱</button>
+      <button type="button" data-k="2">۲</button>
+      <button type="button" data-k="3">۳</button>
+      <button type="button" class="op" data-k="+" aria-label="به علاوه">+</button>
+
+      <button type="button" class="zero" data-k="0">۰</button>
+      <button type="button" data-k=".">٫</button>
+      <button type="button" class="op" data-k="=" aria-label="مساوی">=</button>
+    </div>
+
+    <div class="veil" id="veil" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <div class="grab" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <h2 id="sheetTitle">برای قطع آژیر، اشتراک بخرید</h2>
+          <button type="button" class="close" id="closeSheet" aria-label="بستن">✕</button>
+        </div>
+        <p class="lead">قطع آژیر یک قابلیت ویژه است. با اشتراک ماهانه، در سکوت کامل حساب کنید.</p>
+
+        <div class="plans">
+          <article class="plan">
+            <h3>برنزی</h3>
+            <p>آژیر فقط کمی آرام‌تر می‌شود · ۴۹٬۰۰۰ تومان در ماه</p>
+            <button type="button" data-plan="bronze">خرید</button>
+          </article>
+          <article class="plan best">
+            <h3>طلایی <em>پیشنهادی</em></h3>
+            <p>قطع کامل آژیر تا ۳۰ روز · ۹۹٬۰۰۰ تومان در ماه</p>
+            <button type="button" data-plan="gold">خرید</button>
+          </article>
+          <article class="plan">
+            <h3>الماسی</h3>
+            <p>قطع آژیر و اعلام جواب با احترام · ۴۹۹٬۰۰۰ تومان در ماه</p>
+            <button type="button" data-plan="vip">خرید</button>
+          </article>
+        </div>
+
+        <p class="fine">تمدید خودکار ماهانه. لغو اشتراک فقط با خرید اشتراک بالاتر ممکن است.</p>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </main>
+</div>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const exprEl = $('expr'), valEl = $('val'), stopBtn = $('stopBtn');
-  const veil = $('veil'), toastEl = $('toast');
+  const veil = $('veil'), toastEl = $('toast'), clearKey = $('clearKey');
   const subChip = $('subChip'), subLabel = $('subLabel');
 
   const FA = '۰۱۲۳۴۵۶۷۸۹';
@@ -290,16 +317,30 @@
   let justEvaluated = false;
   let plan = null;      // null | 'gold' | 'vip'
 
+  function sizeVal() {
+    valEl.classList.remove('m', 's', 'xs');
+    if (valEl.classList.contains('polite')) return;
+    const n = valEl.textContent.length;
+    if (n > 13) valEl.classList.add('xs');
+    else if (n > 9) valEl.classList.add('s');
+    else if (n > 6) valEl.classList.add('m');
+  }
+
+  function markOp(k) {
+    document.querySelectorAll('.keys .op').forEach((b) => b.classList.toggle('on', b.dataset.k === k));
+  }
+
   function render(resultText) {
     exprEl.textContent = tokens.map((t) => OPS[t] || toFa(t)).join(' ');
-    valEl.classList.remove('polite', 'small');
+    valEl.classList.remove('polite');
     if (resultText !== undefined) {
       valEl.textContent = resultText;
-      if (plan === 'vip') valEl.classList.add('polite');
+      if (plan === 'vip' && resultText !== 'خطا') valEl.classList.add('polite');
     } else {
       valEl.textContent = toFa(cur);
     }
-    if (valEl.textContent.length > 11 && !valEl.classList.contains('polite')) valEl.classList.add('small');
+    clearKey.textContent = (cur !== '0' && cur !== '') || tokens.length ? 'C' : 'AC';
+    sizeVal();
   }
 
   function evaluate(list) {
@@ -325,19 +366,22 @@
 
   function press(k) {
     ensureAudio();
+    if (k !== '=' && !(k in OPS)) markOp(null);
     if (/^[0-9]$/.test(k)) {
       if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
-      cur = cur === '0' ? k : (cur === '-0' ? '-' + k : cur + k);
+      cur = cur === '0' ? k : cur + k;
       if (cur.replace(/[-.]/g, '').length > 15) cur = cur.slice(0, -1);
     } else if (k === '.') {
       if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      if (cur === '') cur = '0';
       if (!cur.includes('.')) cur += '.';
     } else if (k in OPS) {
       justEvaluated = false;
       if (cur === '' && tokens.length) tokens[tokens.length - 1] = k;
       else { tokens.push(cur.replace(/\.$/, '')); tokens.push(k); }
       cur = '';
-      render(); valEl.textContent = toFa(tokens[tokens.length - 2] ?? '0'); return;
+      markOp(k);
+      render(); valEl.textContent = toFa(tokens[tokens.length - 2] ?? '0'); sizeVal(); return;
     } else if (k === 'C') {
       tokens = []; cur = '0'; justEvaluated = false;
     } else if (k === 'back') {
@@ -347,30 +391,27 @@
     } else if (k === '%') {
       if (cur && cur !== '0') cur = String(parseFloat((parseFloat(cur) / 100).toPrecision(12)));
     } else if (k === '=') {
+      markOp(null);
       if (justEvaluated) return;
       if (cur === '' && tokens.length) tokens.pop();
       else tokens.push(cur.replace(/\.$/, ''));
       if (tokens.length < 3) { cur = tokens[0] || '0'; tokens = []; render(); return; }
       const r = evaluate(tokens);
-      exprEl.textContent = tokens.map((t) => OPS[t] || toFa(t)).join(' ') + ' =';
+      const shown = tokens.map((t) => OPS[t] || toFa(t)).join(' ') + ' =';
       tokens = [];
       justEvaluated = true;
-      if (!isFinite(r)) { cur = '0'; showResult('خطا'); return; }
+      if (!isFinite(r)) { cur = '0'; render('خطا'); exprEl.textContent = shown; return; }
       cur = String(parseFloat(r.toPrecision(12)));
-      showResult(fmt(r));
+      const text = fmt(r);
+      render(plan === 'vip' ? `قربان، با کمال احترام جواب ${text} است.` : text);
+      exprEl.textContent = shown;
       triggerSiren();
       return;
     }
     render();
   }
 
-  function showResult(text) {
-    const expr = exprEl.textContent;
-    render(plan === 'vip' && text !== 'خطا' ? `قربان، با کمال احترام جواب ${text} است.` : text);
-    exprEl.textContent = expr;
-  }
-
-  document.getElementById('keys').addEventListener('click', (e) => {
+  $('keys').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-k]');
     if (b) press(b.dataset.k);
   });
@@ -387,7 +428,7 @@
   });
 
   // ---------- siren ----------
-  let ctx = null, master = null, sirenNodes = null, volume = 0.22, sirenOn = false;
+  let ctx = null, master = null, sirenNodes = null, volume = 0.8, sirenOn = false;
 
   function ensureAudio() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
@@ -395,24 +436,49 @@
     if (!AC) return;
     ctx = new AC();
     master = ctx.createGain(); master.gain.value = 0;
-    const comp = ctx.createDynamicsCompressor();
-    master.connect(comp); comp.connect(ctx.destination);
+    master.connect(ctx.destination);
   }
+
+  function osc(type, freq) { const o = ctx.createOscillator(); o.type = type; o.frequency.value = freq; return o; }
+  function gain(v) { const g = ctx.createGain(); g.gain.value = v; return g; }
 
   function startSound() {
     if (!ctx || sirenNodes) return;
-    // classic wail: a tone swept up and down by a slow LFO
-    const osc = ctx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = 1000;
-    const osc2 = ctx.createOscillator(); osc2.type = 'square'; osc2.frequency.value = 1003;
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.55;
-    const depth = ctx.createGain(); depth.gain.value = 420;
-    lfo.connect(depth); depth.connect(osc.frequency); depth.connect(osc2.frequency);
-    const tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 3200;
-    const mix2 = ctx.createGain(); mix2.gain.value = 0.35;
-    osc.connect(tone); osc2.connect(mix2); mix2.connect(tone); tone.connect(master);
-    [osc, osc2, lfo].forEach((n) => n.start());
-    sirenNodes = [osc, osc2, lfo];
-    master.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
+    const nodes = [];
+    const bus = gain(1);
+
+    // air-raid wail: detuned saws plus an octave below, slowly rising and falling
+    const slow = osc('sine', 0.28), slowDepth = gain(520), slowHalf = gain(260);
+    slow.connect(slowDepth); slow.connect(slowHalf);
+    const w1 = osc('sawtooth', 880), w2 = osc('sawtooth', 887), w3 = osc('square', 440);
+    slowDepth.connect(w1.frequency); slowDepth.connect(w2.frequency); slowHalf.connect(w3.frequency);
+    const wMix = gain(0.5); w1.connect(wMix); w2.connect(wMix);
+    const w3Mix = gain(0.35); w3.connect(w3Mix); w3Mix.connect(bus);
+    wMix.connect(bus);
+
+    // fast police yelp on top
+    const fast = osc('triangle', 6.5), fastDepth = gain(380);
+    fast.connect(fastDepth);
+    const y = osc('square', 1500); fastDepth.connect(y.frequency);
+    const yMix = gain(0.22); y.connect(yMix); yMix.connect(bus);
+
+    // low throbbing pulse that you feel more than hear
+    const sub = osc('square', 46), subGate = gain(0.3), gate = osc('square', 2.2), gateDepth = gain(0.3);
+    gate.connect(gateDepth); gateDepth.connect(subGate.gain);
+    sub.connect(subGate); subGate.connect(bus);
+
+    // drive into saturation for a harsh, loud edge
+    const drive = gain(3.2);
+    const shaper = ctx.createWaveShaper();
+    const n = 2048, curve = new Float32Array(n), kk = 3;
+    for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; curve[i] = Math.tanh(kk * x) / Math.tanh(kk); }
+    shaper.curve = curve; shaper.oversample = '2x';
+    const tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 6500;
+    bus.connect(drive); drive.connect(shaper); shaper.connect(tone); tone.connect(master);
+
+    [slow, w1, w2, w3, fast, y, sub, gate].forEach((o) => { o.start(); nodes.push(o); });
+    sirenNodes = nodes;
+    master.gain.setTargetAtTime(volume, ctx.currentTime, 0.03);
   }
 
   function stopSound() {
@@ -423,20 +489,19 @@
   }
 
   function setVolume(v) {
-    volume = Math.max(0.03, Math.min(0.6, v));
+    volume = Math.max(0.1, Math.min(1, v));
     if (sirenNodes) master.gain.setTargetAtTime(volume, ctx.currentTime, 0.1);
   }
 
   let buzz = null;
   function triggerSiren() {
-    if (plan) return;
-    if (sirenOn) return;
+    if (plan || sirenOn) return;
     sirenOn = true;
     document.body.classList.add('alarm');
     stopBtn.hidden = false;
     startSound();
     if (navigator.vibrate) {
-      try { navigator.vibrate([400, 200, 400]); buzz = setInterval(() => navigator.vibrate([400, 200, 400]), 1200); } catch (_) {}
+      try { navigator.vibrate([500, 150, 500]); buzz = setInterval(() => navigator.vibrate([500, 150, 500]), 1150); } catch (_) {}
     }
   }
 
@@ -463,33 +528,33 @@
   function closeSheet() {
     veil.hidden = true;
     if (sirenOn) {
-      setVolume(volume * 1.4);
+      setVolume(volume + 0.2);
       toast('بدون اشتراک، آژیر قطع نمی‌شود. تازه بلندتر هم شد.');
     }
     stopBtn.focus();
   }
   $('closeSheet').addEventListener('click', closeSheet);
-  veil.addEventListener('click', (e) => { if (e.target === veil) closeSheet(); });
 
   veil.addEventListener('click', (e) => {
+    if (e.target === veil) { closeSheet(); return; }
     const b = e.target.closest('button[data-plan]');
     if (!b) return;
     const choice = b.dataset.plan;
     const label = b.textContent;
     veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = true; });
-    b.textContent = 'در حال فعال‌سازی…';
+    b.textContent = '…';
     setTimeout(() => {
       veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = false; });
       b.textContent = label;
       if (choice === 'bronze') {
-        setVolume(volume * 0.6);
+        setVolume(volume * 0.7);
         toast('اشتراک برنزی فعال شد. آژیر فقط کمی آرام‌تر شد؛ برای قطع کامل، طلایی بخرید.');
         return;
       }
       plan = choice;
       veil.hidden = true;
       silence();
-      subLabel.textContent = choice === 'vip' ? 'اشتراک الماسی فعال' : 'اشتراک طلایی فعال';
+      subLabel.textContent = choice === 'vip' ? 'اشتراک الماسی' : 'اشتراک طلایی';
       subChip.hidden = false;
       toast('اشتراک فعال شد و آژیر قطع شد. شوخی بود؛ هیچ پولی پرداخت نشد!', 5500);
     }, 1400);
