@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ماشین‌حساب آژیری</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;300;400;500;600;700&display=swap">
+<style>
+  /* Layout: an iPhone-style calculator; on wide screens it sits inside a titanium phone body, on phones it fills the screen. Sheets and banners live inside the screen. Single dark world on purpose. */
+  :root {
+    --ground: #050506;
+    --screen: #000;
+    --fg: #fff;
+    --muted: #8e8e93;
+    --key: #333335;
+    --key-hi: #3f3f42;
+    --fn: #a5a5a5;
+    --fn-hi: #d4d4d2;
+    --op: #ff9f0a;
+    --op-hi: #ffb340;
+    --alarm: #ff1f2d;
+    --sheet: #1c1c1e;
+    --row: #2c2c2e;
+    --font: "Vazirmatn", -apple-system, "SF Pro Display", Tahoma, system-ui, sans-serif;
+    --gap: 14px;
+    /* screen size; keys shrink to fit whichever runs out first */
+    --sw: 330px;
+    --sh: calc(min(848px, 100vh - 48px) - 22px);
+    --reserve: 336px;   /* screen padding + display + stop button + key gaps */
+    color-scheme: dark;
+  }
+  @supports (height: 100dvh) { :root { --sh: calc(min(848px, 100dvh - 48px) - 22px); } }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(120% 80% at 50% 0%, #17171b 0%, var(--ground) 60%);
+    background-color: var(--ground);
+    color: var(--fg); font-family: var(--font);
+    display: grid; place-items: center;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
+    overflow: hidden;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(255,20,35,.55) 100%);
+  }
+  body.alarm::after { animation: flood .45s steps(1) infinite; }
+  @keyframes flood { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Phone body (wide screens) */
+  .phone {
+    width: min(392px, 100%);
+    height: min(848px, calc(100vh - 48px));
+    height: min(848px, calc(100dvh - 48px));
+    border-radius: 60px;
+    padding: 11px;
+    background: linear-gradient(145deg, #6b6b70 0%, #2a2a2d 22%, #48484c 50%, #1d1d20 78%, #5d5d62 100%);
+    box-shadow:
+      0 50px 90px -20px rgba(0,0,0,.9),
+      0 30px 40px -30px rgba(0,0,0,.8),
+      inset 0 0 0 1px rgba(255,255,255,.18),
+      inset 0 0 0 3px #0c0c0d;
+    transform: perspective(1600px) rotateX(4deg);
+    transform-origin: 50% 100%;
+    position: relative;
+  }
+  .screen {
+    position: relative; height: 100%;
+    background: var(--screen);
+    border-radius: 50px; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 60px 20px 34px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .island {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 35px; border-radius: 20px; background: #000;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    z-index: 40;
+  }
+  .screen::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(130% 70% at 50% 0%, rgba(255,30,45,.75), transparent 70%);
+  }
+  body.alarm .screen::after { animation: flood .45s steps(1) infinite; }
+
+  @media (max-width: 520px), (max-height: 640px) {
+    :root {
+      --sw: calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+      --sh: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+      --reserve: calc(296px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px));
+    }
+    @supports (height: 100dvh) { :root { --sh: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); } }
+    body { padding: 0; background: var(--screen); overflow-y: auto; display: block; }
+    .phone { width: 100%; height: auto; min-height: 100%; display: flex; flex-direction: column; border-radius: 0; padding: 0; background: none; box-shadow: none; transform: none; }
+    .screen {
+      height: auto; flex: 1;
+      border-radius: 0;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    }
+    .island { display: none; }
+  }
+
+  .status {
+    position: absolute; top: 58px; right: 24px; left: 24px;
+    display: flex; justify-content: flex-start;
+    font-size: 12px; color: var(--muted);
+  }
+  @media (max-width: 520px), (max-height: 640px) { .status { top: calc(14px + env(safe-area-inset-top, 0px)); } }
+  .status button { all: unset; cursor: pointer; color: var(--op); margin-inline-start: 6px; }
+
+  .display {
+    flex: 1; min-height: 110px;
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch;
+    padding: 0 8px 14px; gap: 2px;
+    direction: ltr; text-align: right;
+  }
+  .expr, .val { unicode-bidi: bidi-override; }
+  .expr { font-size: 22px; font-weight: 300; color: var(--muted); min-height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .val {
+    font-size: min(84px, 19vw); font-weight: 200; line-height: 1.05; letter-spacing: -.01em;
+    white-space: nowrap; overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    transition: color .2s;
+  }
+  .val.m { font-size: min(64px, 15vw); } .val.s { font-size: min(48px, 11vw); } .val.xs { font-size: min(36px, 8.5vw); }
+  .val.polite { font-size: 28px; font-weight: 300; direction: rtl; unicode-bidi: plaintext; text-align: right; white-space: normal; line-height: 1.6; }
+  body.alarm .val { color: #ffd9dc; text-shadow: 0 0 24px rgba(255,40,55,.7); }
+
+  .stop {
+    font: inherit; font-size: 17px; font-weight: 600;
+    margin: 0 4px 14px; padding: 14px;
+    border: 0; border-radius: 999px; cursor: pointer;
+    color: #fff;
+    background: linear-gradient(180deg, #ff4b55, #d70015);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 10px 30px rgba(255,20,40,.55);
+  }
+  .stop:active { transform: scale(.98); }
+
+  .keys {
+    --k: max(44px, min(84px, calc((var(--sw) - 3 * var(--gap)) / 4), calc((var(--sh) - var(--reserve)) / 5)));
+    display: grid; grid-template-columns: repeat(4, var(--k)); grid-auto-rows: var(--k);
+    gap: var(--gap); justify-content: center; direction: ltr;
+  }
+  .keys button {
+    font: inherit; font-size: calc(var(--k) * .42); font-weight: 400; color: var(--fg);
+    width: 100%; height: 100%;
+    border: 0; border-radius: 999px; cursor: pointer;
+    background: linear-gradient(180deg, var(--key-hi) 0%, var(--key) 55%, #2a2a2c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.16),
+      inset 0 -3px 6px rgba(0,0,0,.35),
+      0 8px 16px -6px rgba(0,0,0,.9),
+      0 2px 3px rgba(0,0,0,.6);
+    transition: transform .08s ease, filter .25s ease, box-shadow .08s ease;
+    display: grid; place-items: center;
+  }
+  .keys button:active {
+    transform: translateY(1px) scale(.96);
+    filter: brightness(1.45);
+    transition-duration: 0s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 -1px 3px rgba(0,0,0,.3), 0 3px 6px -3px rgba(0,0,0,.9);
+  }
+  .keys .fn { background: linear-gradient(180deg, var(--fn-hi) 0%, var(--fn) 70%, #969696 100%); color: #000; font-size: calc(var(--k) * .34); font-weight: 500; }
+  .keys .op { background: linear-gradient(180deg, var(--op-hi) 0%, var(--op) 60%, #f08c00 100%); font-size: calc(var(--k) * .46); }
+  .keys .op.on { background: #fff; color: var(--op); }
+  .keys .zero { grid-column: span 2; justify-items: start; padding-inline: calc(var(--k) * .38) 0; }
+  .keys button:focus-visible, .stop:focus-visible, .plan button:focus-visible, .close:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  /* Subscription sheet, iOS style */
+  .veil {
+    position: absolute; inset: 0; z-index: 30;
+    background: rgba(0,0,0,.45);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+    display: flex; align-items: flex-end;
+    animation: fade .25s ease-out;
+  }
+  @keyframes fade { from { opacity: 0; } }
+  .sheet {
+    width: 100%; max-height: calc(100% - 40px); overflow-y: auto;
+    background: var(--sheet);
+    border-radius: 28px 28px 0 0;
+    padding: 10px 18px calc(26px + env(safe-area-inset-bottom, 0px));
+    display: grid; gap: 14px;
+    animation: rise .35s cubic-bezier(.2,.9,.25,1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,.6);
+  }
+  @keyframes rise { from { transform: translateY(100%); } }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: #48484a; justify-self: center; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .sheet h2 { margin: 0; font-size: 21px; font-weight: 700; text-wrap: balance; }
+  .close {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer;
+    background: #3a3a3c; color: #aeaeb2; font: inherit; font-size: 15px; font-weight: 700;
+  }
+  .lead { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+  .plans { display: grid; gap: 10px; }
+  .plan {
+    background: var(--row); border-radius: 18px; padding: 14px 16px;
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .plan.best { box-shadow: inset 0 0 0 1.5px var(--op); }
+  .plan h3 { margin: 0; font-size: 16px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .plan h3 em { font-style: normal; font-size: 11px; font-weight: 600; color: #000; background: var(--op); border-radius: 999px; padding: 1px 8px; }
+  .plan p { margin: 0; grid-column: 1; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .plan button {
+    grid-row: 1 / span 2; grid-column: 2;
+    font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
+    border: 0; border-radius: 999px; padding: 9px 16px; cursor: pointer;
+    background: #3a3a3c; color: var(--op);
+    min-width: 76px;
+  }
+  .plan.best button { background: var(--op); color: #000; }
+  .plan button:disabled { opacity: .55; cursor: progress; }
+  .fine { margin: 0; font-size: 11px; color: #636366; text-align: center; }
+
+  /* Banner, like a notification under the island */
+  .toast {
+    position: absolute; z-index: 50; top: 56px; left: 14px; right: 14px;
+    background: rgba(44,44,46,.92);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-radius: 20px; padding: 13px 16px; font-size: 14px; line-height: 1.7;
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+    animation: drop .35s cubic-bezier(.2,.9,.25,1);
+  }
+  @media (max-width: 520px), (max-height: 640px) { .toast { top: calc(10px + env(safe-area-inset-top, 0px)); } }
+  @keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.alarm::after, body.alarm .screen::after { animation: none; opacity: .7; }
+    .phone { transform: none; }
+    .sheet, .veil, .toast { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <main class="screen" aria-label="ماشین‌حساب">
+    <div class="island" aria-hidden="true"></div>
+    <div class="status" id="subChip" hidden><span id="subLabel">اشتراک فعال</span><button type="button" id="cancelSub">لغو</button></div>
+
+    <div class="display" role="status" aria-live="polite">
+      <div class="expr" id="expr"></div>
+      <div class="val" id="val">۰</div>
+    </div>
+
+    <button type="button" class="stop" id="stopBtn" hidden>توقف آژیر</button>
+
+    <div class="keys" id="keys">
+      <button type="button" class="fn" data-k="C" id="clearKey">AC</button>
+      <button type="button" class="fn" data-k="back" aria-label="پاک کردن آخرین رقم">⌫</button>
+      <button type="button" class="fn" data-k="%">%</button>
+      <button type="button" class="op" data-k="/" aria-label="تقسیم">÷</button>
+
+      <button type="button" data-k="7">۷</button>
+      <button type="button" data-k="8">۸</button>
+      <button type="button" data-k="9">۹</button>
+      <button type="button" class="op" data-k="*" aria-label="ضرب">×</button>
+
+      <button type="button" data-k="4">۴</button>
+      <button type="button" data-k="5">۵</button>
+      <button type="button" data-k="6">۶</button>
+      <button type="button" class="op" data-k="-" aria-label="منها">−</button>
+
+      <button type="button" data-k="1">۱</button>
+      <button type="button" data-k="2">۲</button>
+      <button type="button" data-k="3">۳</button>
+      <button type="button" class="op" data-k="+" aria-label="به علاوه">+</button>
+
+      <button type="button" class="zero" data-k="0">۰</button>
+      <button type="button" data-k=".">٫</button>
+      <button type="button" class="op" data-k="=" aria-label="مساوی">=</button>
+    </div>
+
+    <div class="veil" id="veil" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <div class="grab" aria-hidden="true"></div>
+        <div class="sheet-head">
+          <h2 id="sheetTitle">برای قطع آژیر، اشتراک بخرید</h2>
+          <button type="button" class="close" id="closeSheet" aria-label="بستن">✕</button>
+        </div>
+        <p class="lead">آژیر فقط با اشتراک قطع می‌شود.</p>
+
+        <div class="plans">
+          <article class="plan">
+            <h3>برنزی</h3>
+            <p>آژیر کمی آرام‌تر می‌شود</p>
+            <button type="button" data-plan="bronze"><bdi dir="ltr">۱٫۹۹$</bdi></button>
+          </article>
+          <article class="plan best">
+            <h3>طلایی <em>پیشنهادی</em></h3>
+            <p>آژیر کامل قطع می‌شود</p>
+            <button type="button" data-plan="gold"><bdi dir="ltr">۴٫۹۹$</bdi></button>
+          </article>
+          <article class="plan">
+            <h3>الماسی</h3>
+            <p>قطع آژیر و جواب با احترام</p>
+            <button type="button" data-plan="vip"><bdi dir="ltr">۹٫۹۹$</bdi></button>
+          </article>
+        </div>
+
+        <p class="fine">قیمت‌ها ماهانه است و هر ماه خودکار تمدید می‌شود.</p>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const exprEl = $('expr'), valEl = $('val'), stopBtn = $('stopBtn');
+  const veil = $('veil'), toastEl = $('toast'), clearKey = $('clearKey');
+  const subChip = $('subChip'), subLabel = $('subLabel');
+
+  const FA = '۰۱۲۳۴۵۶۷۸۹';
+  const toFa = (s) => String(s).replace(/[0-9]/g, (d) => FA[d]).replace(/\./g, '٫');
+  const OPS = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  // ---------- calculator state ----------
+  let tokens = [];      // numbers (as strings) and operators
+  let cur = '0';        // number being typed
+  let justEvaluated = false;
+  let plan = null;      // null | 'gold' | 'vip'
+
+  function sizeVal() {
+    valEl.classList.remove('m', 's', 'xs');
+    if (valEl.classList.contains('polite')) return;
+    const n = valEl.textContent.length;
+    if (n > 13) valEl.classList.add('xs');
+    else if (n > 9) valEl.classList.add('s');
+    else if (n > 6) valEl.classList.add('m');
+  }
+
+  function markOp(k) {
+    document.querySelectorAll('.keys .op').forEach((b) => b.classList.toggle('on', b.dataset.k === k));
+  }
+
+  function render(resultText) {
+    exprEl.textContent = tokens.map((t) => OPS[t] || toFa(t)).join(' ');
+    valEl.classList.remove('polite');
+    if (resultText !== undefined) {
+      valEl.textContent = resultText;
+      if (plan === 'vip' && resultText !== 'خطا') valEl.classList.add('polite');
+    } else {
+      valEl.textContent = toFa(cur);
+    }
+    clearKey.textContent = (cur !== '0' && cur !== '') || tokens.length ? 'C' : 'AC';
+    sizeVal();
+  }
+
+  function evaluate(list) {
+    // two passes: × ÷ first, then + −
+    const nums = [parseFloat(list[0])], ops = [];
+    for (let i = 1; i < list.length; i += 2) {
+      const op = list[i], n = parseFloat(list[i + 1]);
+      if (op === '*' || op === '/') {
+        const a = nums.pop();
+        if (op === '/' && n === 0) return NaN;
+        nums.push(op === '*' ? a * n : a / n);
+      } else { ops.push(op); nums.push(n); }
+    }
+    let r = nums[0];
+    ops.forEach((op, i) => { r = op === '+' ? r + nums[i + 1] : r - nums[i + 1]; });
+    return r;
+  }
+
+  function fmt(n) {
+    const clean = parseFloat(n.toPrecision(12));
+    return clean.toLocaleString('fa-IR', { maximumFractionDigits: 10 });
+  }
+
+  function press(k) {
+    ensureAudio();
+    if (k !== '=' && !(k in OPS)) markOp(null);
+    if (/^[0-9]$/.test(k)) {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      cur = cur === '0' ? k : cur + k;
+      if (cur.replace(/[-.]/g, '').length > 15) cur = cur.slice(0, -1);
+    } else if (k === '.') {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      if (cur === '') cur = '0';
+      if (!cur.includes('.')) cur += '.';
+    } else if (k in OPS) {
+      justEvaluated = false;
+      if (cur === '' && tokens.length) tokens[tokens.length - 1] = k;
+      else { tokens.push(cur.replace(/\.$/, '')); tokens.push(k); }
+      cur = '';
+      markOp(k);
+      render(); valEl.textContent = toFa(tokens[tokens.length - 2] ?? '0'); sizeVal(); return;
+    } else if (k === 'C') {
+      tokens = []; cur = '0'; justEvaluated = false;
+    } else if (k === 'back') {
+      if (justEvaluated) { tokens = []; cur = '0'; justEvaluated = false; }
+      else cur = cur.length > 1 ? cur.slice(0, -1) : '0';
+      if (cur === '-') cur = '0';
+    } else if (k === '%') {
+      if (cur && cur !== '0') cur = String(parseFloat((parseFloat(cur) / 100).toPrecision(12)));
+    } else if (k === '=') {
+      markOp(null);
+      if (justEvaluated) return;
+      if (cur === '' && tokens.length) tokens.pop();
+      else tokens.push(cur.replace(/\.$/, ''));
+      if (tokens.length < 3) { cur = tokens[0] || '0'; tokens = []; render(); return; }
+      const r = evaluate(tokens);
+      const shown = tokens.map((t) => OPS[t] || toFa(t)).join(' ') + ' =';
+      tokens = [];
+      justEvaluated = true;
+      if (!isFinite(r)) { cur = '0'; render('خطا'); exprEl.textContent = shown; return; }
+      cur = String(parseFloat(r.toPrecision(12)));
+      const text = fmt(r);
+      render(plan === 'vip' ? `قربان، با کمال احترام جواب ${text} است.` : text);
+      exprEl.textContent = shown;
+      triggerSiren();
+      return;
+    }
+    render();
+  }
+
+  $('keys').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-k]');
+    if (b) press(b.dataset.k);
+  });
+
+  const KEYMAP = { Enter: '=', '=': '=', Backspace: 'back', Escape: 'C', Delete: 'C', ',': '.', 'x': '*', 'X': '*' };
+  document.addEventListener('keydown', (e) => {
+    if (!veil.hidden) { if (e.key === 'Escape') closeSheet(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    let k = KEYMAP[e.key] || e.key;
+    const fa = FA.indexOf(k); if (fa >= 0) k = String(fa);
+    if (/^[0-9]$/.test(k) || k in OPS || ['.', '=', 'C', 'back', '%'].includes(k)) {
+      e.preventDefault(); press(k);
+    }
+  });
+
+  // ---------- siren ----------
+  let ctx = null, master = null, sirenNodes = null, volume = 0.8, sirenOn = false;
+
+  function ensureAudio() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0;
+    master.connect(ctx.destination);
+  }
+
+  function osc(type, freq) { const o = ctx.createOscillator(); o.type = type; o.frequency.value = freq; return o; }
+  function gain(v) { const g = ctx.createGain(); g.gain.value = v; return g; }
+
+  function startSound() {
+    if (!ctx || sirenNodes) return;
+    const nodes = [];
+    const bus = gain(1);
+
+    // air-raid wail: detuned saws plus an octave below, slowly rising and falling
+    const slow = osc('sine', 0.28), slowDepth = gain(520), slowHalf = gain(260);
+    slow.connect(slowDepth); slow.connect(slowHalf);
+    const w1 = osc('sawtooth', 880), w2 = osc('sawtooth', 887), w3 = osc('square', 440);
+    slowDepth.connect(w1.frequency); slowDepth.connect(w2.frequency); slowHalf.connect(w3.frequency);
+    const wMix = gain(0.5); w1.connect(wMix); w2.connect(wMix);
+    const w3Mix = gain(0.35); w3.connect(w3Mix); w3Mix.connect(bus);
+    wMix.connect(bus);
+
+    // fast police yelp on top
+    const fast = osc('triangle', 6.5), fastDepth = gain(380);
+    fast.connect(fastDepth);
+    const y = osc('square', 1500); fastDepth.connect(y.frequency);
+    const yMix = gain(0.22); y.connect(yMix); yMix.connect(bus);
+
+    // low throbbing pulse that you feel more than hear
+    const sub = osc('square', 46), subGate = gain(0.3), gate = osc('square', 2.2), gateDepth = gain(0.3);
+    gate.connect(gateDepth); gateDepth.connect(subGate.gain);
+    sub.connect(subGate); subGate.connect(bus);
+
+    // drive into saturation for a harsh, loud edge
+    const drive = gain(3.2);
+    const shaper = ctx.createWaveShaper();
+    const n = 2048, curve = new Float32Array(n), kk = 3;
+    for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; curve[i] = Math.tanh(kk * x) / Math.tanh(kk); }
+    shaper.curve = curve; shaper.oversample = '2x';
+    const tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 6500;
+    bus.connect(drive); drive.connect(shaper); shaper.connect(tone); tone.connect(master);
+
+    [slow, w1, w2, w3, fast, y, sub, gate].forEach((o) => { o.start(); nodes.push(o); });
+    sirenNodes = nodes;
+    master.gain.setTargetAtTime(volume, ctx.currentTime, 0.03);
+  }
+
+  function stopSound() {
+    if (!sirenNodes) return;
+    const nodes = sirenNodes; sirenNodes = null;
+    master.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+    setTimeout(() => nodes.forEach((n) => { try { n.stop(); } catch (_) {} }), 300);
+  }
+
+  function setVolume(v) {
+    volume = Math.max(0.1, Math.min(1, v));
+    if (sirenNodes) master.gain.setTargetAtTime(volume, ctx.currentTime, 0.1);
+  }
+
+  let buzz = null;
+  function triggerSiren() {
+    if (plan || sirenOn) return;
+    sirenOn = true;
+    document.body.classList.add('alarm');
+    stopBtn.hidden = false;
+    startSound();
+    if (navigator.vibrate) {
+      try { navigator.vibrate([500, 150, 500]); buzz = setInterval(() => navigator.vibrate([500, 150, 500]), 1150); } catch (_) {}
+    }
+  }
+
+  function silence() {
+    sirenOn = false;
+    document.body.classList.remove('alarm');
+    stopBtn.hidden = true;
+    stopSound();
+    clearInterval(buzz); try { navigator.vibrate && navigator.vibrate(0); } catch (_) {}
+  }
+
+  // ---------- subscription sheet ----------
+  let toastTimer = null;
+  function toast(msg, ms = 4200) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, ms);
+  }
+
+  stopBtn.addEventListener('click', () => {
+    veil.hidden = false;
+    veil.querySelector('.plan.best button').focus();
+  });
+
+  function closeSheet() {
+    veil.hidden = true;
+    if (sirenOn) {
+      setVolume(volume + 0.2);
+      toast('بدون اشتراک، آژیر قطع نمی‌شود. تازه بلندتر هم شد.');
+    }
+    stopBtn.focus();
+  }
+  $('closeSheet').addEventListener('click', closeSheet);
+
+  veil.addEventListener('click', (e) => {
+    if (e.target === veil) { closeSheet(); return; }
+    const b = e.target.closest('button[data-plan]');
+    if (!b) return;
+    const choice = b.dataset.plan;
+    const label = b.innerHTML;
+    veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = true; });
+    b.textContent = '…';
+    setTimeout(() => {
+      veil.querySelectorAll('button[data-plan]').forEach((x) => { x.disabled = false; });
+      b.innerHTML = label;
+      if (choice === 'bronze') {
+        setVolume(volume * 0.7);
+        toast('اشتراک برنزی فعال شد. آژیر فقط کمی آرام‌تر شد؛ برای قطع کامل، طلایی بخرید.');
+        return;
+      }
+      plan = choice;
+      veil.hidden = true;
+      silence();
+      subLabel.textContent = choice === 'vip' ? 'اشتراک الماسی' : 'اشتراک طلایی';
+      subChip.hidden = false;
+      toast('اشتراک فعال شد و آژیر قطع شد. شوخی بود؛ هیچ پولی پرداخت نشد!', 5500);
+    }, 1400);
+  });
+
+  $('cancelSub').addEventListener('click', () => {
+    plan = null; subChip.hidden = true;
+    toast('اشتراک لغو شد. آژیر برگشت سر کارش.');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
